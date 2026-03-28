@@ -1,5 +1,6 @@
 import { useState, useCallback, useRef, useEffect } from "react";
 import { exercises, type Exercise } from "@/lib/exerciseData";
+import { useSound } from "./useSound";
 
 export type SessionState = "idle" | "countdown" | "running" | "paused" | "finished";
 
@@ -10,6 +11,9 @@ export function useTimer() {
   const [countdownValue, setCountdownValue] = useState(5);
   const [totalElapsed, setTotalElapsed] = useState(0);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const prevIndexRef = useRef(0);
+
+  const { playTransition, playExerciseStart, playCountdownTick, playFinished, playWarning } = useSound();
 
   const currentExercise: Exercise = exercises[currentIndex];
 
@@ -67,7 +71,36 @@ export function useTimer() {
     setTimeLeft(exercises[0].duration);
     setSessionState("idle");
     setTotalElapsed(0);
+    prevIndexRef.current = 0;
   }, [clearTimer]);
+
+  // Play sound on exercise change
+  useEffect(() => {
+    if (sessionState !== "running" && sessionState !== "paused") return;
+    if (currentIndex === prevIndexRef.current) return;
+    
+    const exercise = exercises[currentIndex];
+    if (exercise.isTransition) {
+      playTransition();
+    } else {
+      playExerciseStart();
+    }
+    prevIndexRef.current = currentIndex;
+  }, [currentIndex, sessionState, playTransition, playExerciseStart]);
+
+  // Play countdown tick
+  useEffect(() => {
+    if (sessionState === "countdown" && countdownValue > 0) {
+      playCountdownTick();
+    }
+  }, [countdownValue, sessionState, playCountdownTick]);
+
+  // Play warning beep at 3 seconds remaining
+  useEffect(() => {
+    if (sessionState === "running" && timeLeft === 3) {
+      playWarning();
+    }
+  }, [timeLeft, sessionState, playWarning]);
 
   // Main timer effect
   useEffect(() => {
@@ -80,6 +113,7 @@ export function useTimer() {
           setCurrentIndex((idx) => {
             if (idx >= exercises.length - 1) {
               setSessionState("finished");
+              playFinished();
               return idx;
             }
             const nextIdx = idx + 1;
@@ -94,7 +128,7 @@ export function useTimer() {
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [sessionState]);
+  }, [sessionState, playFinished]);
 
   const progress = currentExercise
     ? ((currentExercise.duration - timeLeft) / currentExercise.duration) * 100

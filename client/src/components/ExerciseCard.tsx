@@ -1,12 +1,13 @@
 /*
- * Design: "Néon Fitness Flow" — Carte d'exercice avec bordure colorée et coaching
- * Affiche position, mouvement et coaching pour l'exercice actif
+ * Design: "Néon Fitness Flow" — Carte d'exercice avec IMAGE de mouvement
+ * Affiche l'illustration de l'exercice, position, mouvement, coaching et muscles ciblés
  */
 
 import { motion, AnimatePresence } from "framer-motion";
 import type { Exercise, Phase } from "@/lib/exerciseData";
 import { getExerciseNumber, getTotalMainExercises } from "@/lib/exerciseData";
-import { MapPin, Dumbbell, MessageCircle } from "lucide-react";
+import { MapPin, Dumbbell, MessageCircle, Target } from "lucide-react";
+import { useState } from "react";
 
 interface ExerciseCardProps {
   exercise: Exercise;
@@ -32,6 +33,8 @@ const PHASE_BADGE_BG: Record<Phase, string> = {
 };
 
 export default function ExerciseCard({ exercise, isActive }: ExerciseCardProps) {
+  const [imgError, setImgError] = useState(false);
+
   if (exercise.isTransition) {
     return (
       <AnimatePresence mode="wait">
@@ -67,6 +70,7 @@ export default function ExerciseCard({ exercise, isActive }: ExerciseCardProps) 
 
   const exerciseNum = getExerciseNumber(exercise);
   const totalExercises = getTotalMainExercises();
+  const hasImage = exercise.imageUrl && !imgError;
 
   return (
     <AnimatePresence mode="wait">
@@ -81,6 +85,28 @@ export default function ExerciseCard({ exercise, isActive }: ExerciseCardProps) 
         <div
           className={`rounded-xl bg-gradient-to-r ${PHASE_BG[exercise.phase]} bg-card border border-border/50 border-l-4 ${PHASE_BORDER[exercise.phase]} overflow-hidden`}
         >
+          {/* Exercise Image */}
+          {hasImage && (
+            <div className="relative w-full aspect-[16/9] overflow-hidden bg-black/30">
+              <img
+                src={exercise.imageUrl}
+                alt={exercise.name}
+                className="w-full h-full object-contain"
+                onError={() => setImgError(true)}
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-card via-transparent to-transparent" />
+              {/* Muscles badge overlay */}
+              {exercise.targetMuscles && (
+                <div className="absolute bottom-3 right-3 flex items-center gap-1.5 bg-black/60 backdrop-blur-sm rounded-full px-3 py-1.5">
+                  <Target className="w-3 h-3 text-red-400" />
+                  <span className="text-[10px] text-white/80 font-medium">
+                    {exercise.targetMuscles}
+                  </span>
+                </div>
+              )}
+            </div>
+          )}
+
           {/* Header */}
           <div className="px-6 pt-5 pb-3 flex items-center justify-between">
             <div className="flex items-center gap-3">

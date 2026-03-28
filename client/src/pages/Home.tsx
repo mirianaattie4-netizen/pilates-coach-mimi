@@ -1,6 +1,6 @@
 /*
  * Design: "Néon Fitness Flow" — Page d'accueil immersive
- * Hero sombre avec image de fond, présentation de la séance, CTA puissant
+ * Hero sombre avec vidéo de fond, photo réelle de Coach Mimi, séance 1h
  */
 
 import { Button } from "@/components/ui/button";
@@ -14,9 +14,14 @@ import {
   ChevronRight,
   Zap,
   Shield,
+  Volume2,
+  Image as ImageIcon,
 } from "lucide-react";
 import { useLocation } from "wouter";
+import { useRef, useState } from "react";
 
+const HERO_VIDEO =
+  "https://d2xsxph8kpxj0f.cloudfront.net/310519663442254125/EDJjErcDe3f7pkvHdYd45d/jardindeden_2103c822.mp4";
 const HERO_IMG =
   "https://d2xsxph8kpxj0f.cloudfront.net/310519663442254125/EDJjErcDe3f7pkvHdYd45d/hero-pilates-dark-CZJEWSuRmdsaPbzNWyDpUx.png";
 const WARMUP_IMG =
@@ -25,21 +30,38 @@ const WORKOUT_IMG =
   "https://d2xsxph8kpxj0f.cloudfront.net/310519663442254125/EDJjErcDe3f7pkvHdYd45d/workout-phase-dCquAFYUfWGuPVnKqNuaQV.webp";
 const COOLDOWN_IMG =
   "https://d2xsxph8kpxj0f.cloudfront.net/310519663442254125/EDJjErcDe3f7pkvHdYd45d/cooldown-phase-Js4T7k9uzVys8RZyKVjwgM.webp";
-const AVATAR_IMG =
-  "https://d2xsxph8kpxj0f.cloudfront.net/310519663442254125/EDJjErcDe3f7pkvHdYd45d/coach-mimi-avatar-hfcycmBwyyDs9wsxruTsZB.webp";
+const COACH_PHOTO =
+  "https://d2xsxph8kpxj0f.cloudfront.net/310519663442254125/EDJjErcDe3f7pkvHdYd45d/coach-mimi-photo_6625e8f3.jpeg";
 
 export default function Home() {
   const [, setLocation] = useLocation();
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [videoLoaded, setVideoLoaded] = useState(false);
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      {/* HERO SECTION */}
+      {/* HERO SECTION with Video Background */}
       <section className="relative min-h-screen flex items-center overflow-hidden">
-        {/* Background */}
-        <div
-          className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: `url(${HERO_IMG})` }}
-        />
+        {/* Video Background */}
+        <video
+          ref={videoRef}
+          autoPlay
+          muted
+          loop
+          playsInline
+          onCanPlay={() => setVideoLoaded(true)}
+          className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ${videoLoaded ? "opacity-30" : "opacity-0"}`}
+          poster={HERO_IMG}
+        >
+          <source src={HERO_VIDEO} type="video/mp4" />
+        </video>
+        {/* Fallback image */}
+        {!videoLoaded && (
+          <div
+            className="absolute inset-0 bg-cover bg-center opacity-20"
+            style={{ backgroundImage: `url(${HERO_IMG})` }}
+          />
+        )}
         <div className="absolute inset-0 bg-gradient-to-r from-background via-background/85 to-background/40" />
         <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-background/30" />
 
@@ -57,13 +79,13 @@ export default function Home() {
                   <Flame className="w-4 h-4 text-red-400" />
                 </div>
                 <span className="font-display text-xs uppercase tracking-[0.25em] text-red-400 font-medium">
-                  Pilates-Strength &middot; Débutant
+                  Pilates-Strength &middot; Débutant &middot; Full Body
                 </span>
               </div>
 
               {/* Title */}
               <h1 className="font-display text-5xl md:text-7xl font-bold leading-[0.95] mb-6">
-                <span className="text-foreground">Séance</span>
+                <span className="text-foreground">1 Heure de</span>
                 <br />
                 <span className="text-foreground">Pilates avec</span>
                 <br />
@@ -74,16 +96,16 @@ export default function Home() {
 
               {/* Description */}
               <p className="text-lg text-foreground/60 leading-relaxed mb-8 max-w-lg">
-                Inspirée du style de Marie Steffen. 24 exercices guidés avec
-                timer intégré, instructions de coaching en temps réel et
-                défilement automatique.
+                Séance complète Full Body guidée par Coach Mimi. 60 exercices
+                avec timer, illustrations de mouvements, signal sonore et
+                instructions de coaching en temps réel.
               </p>
 
               {/* Stats */}
               <div className="flex flex-wrap gap-6 mb-10">
                 <div className="flex items-center gap-2">
                   <Clock className="w-4 h-4 text-muted-foreground" />
-                  <span className="text-sm text-foreground/70">~24 min</span>
+                  <span className="text-sm text-foreground/70">60 min</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Dumbbell className="w-4 h-4 text-muted-foreground" />
@@ -95,6 +117,18 @@ export default function Home() {
                   <Zap className="w-4 h-4 text-muted-foreground" />
                   <span className="text-sm text-foreground/70">
                     45s effort / 15s repos
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Volume2 className="w-4 h-4 text-muted-foreground" />
+                  <span className="text-sm text-foreground/70">
+                    Signal sonore
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <ImageIcon className="w-4 h-4 text-muted-foreground" />
+                  <span className="text-sm text-foreground/70">
+                    Photos mouvements
                   </span>
                 </div>
               </div>
@@ -139,7 +173,7 @@ export default function Home() {
               Structure de la séance
             </span>
             <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground">
-              3 phases, 24 exercices
+              3 phases, 60 exercices, 1 heure
             </h2>
           </motion.div>
 
@@ -172,12 +206,13 @@ export default function Home() {
                 </h3>
                 <p className="text-sm text-muted-foreground leading-relaxed mb-3">
                   Déverrouiller les articulations et préparer la colonne
-                  vertébrale avec des exercices de mobilité 90/90.
+                  vertébrale avec des exercices de mobilité 90/90, Cat-Cow et
+                  Thread the Needle.
                 </p>
                 <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                  <span>5 exercices</span>
+                  <span>8 exercices</span>
                   <span>&middot;</span>
-                  <span>5 min</span>
+                  <span>8 min</span>
                   <span>&middot;</span>
                   <span>Sans poids</span>
                 </div>
@@ -208,16 +243,16 @@ export default function Home() {
                   </span>
                 </div>
                 <h3 className="font-display text-xl font-bold text-foreground mb-2">
-                  Pilates Strength
+                  Pilates Strength Full Body
                 </h3>
                 <p className="text-sm text-muted-foreground leading-relaxed mb-3">
-                  Renforcement musculaire complet avec haltères légers. Abdos,
-                  fessiers, planches et rotations.
+                  7 blocs de renforcement : abdos profonds, fessiers, cuisses,
+                  haut du corps, épaules, core et finisher.
                 </p>
                 <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                  <span>15 exercices</span>
+                  <span>43 exercices</span>
                   <span>&middot;</span>
-                  <span>15 min</span>
+                  <span>44 min</span>
                   <span>&middot;</span>
                   <span>Avec poids</span>
                 </div>
@@ -251,13 +286,13 @@ export default function Home() {
                   Retour au calme
                 </h3>
                 <p className="text-sm text-muted-foreground leading-relaxed mb-3">
-                  Relâcher les tensions, étirer la colonne et les fessiers.
-                  Respiration profonde et récupération.
+                  Étirements profonds, torsions, posture de l'enfant et
+                  relaxation finale en Savasana.
                 </p>
                 <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                  <span>4 exercices</span>
+                  <span>9 exercices</span>
                   <span>&middot;</span>
-                  <span>4 min</span>
+                  <span>9 min</span>
                   <span>&middot;</span>
                   <span>Étirements</span>
                 </div>
@@ -267,7 +302,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* FEATURES SECTION */}
+      {/* FEATURES SECTION with Coach Mimi real photo */}
       <section className="py-24 border-t border-border/20">
         <div className="container">
           <div className="grid md:grid-cols-2 gap-16 items-center">
@@ -292,25 +327,39 @@ export default function Home() {
                   </div>
                   <div>
                     <h3 className="font-display font-semibold text-foreground mb-1">
-                      Timer automatique
+                      Timer automatique 1h
                     </h3>
                     <p className="text-sm text-muted-foreground leading-relaxed">
                       Compte à rebours visuel pour chaque exercice. 45 secondes
-                      d'effort, 15 secondes de transition.
+                      d'effort, 15 secondes de transition. Séance complète d'une heure.
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-4">
+                  <div className="w-10 h-10 rounded-xl bg-orange-500/10 flex items-center justify-center shrink-0">
+                    <Volume2 className="w-5 h-5 text-orange-400" />
+                  </div>
+                  <div>
+                    <h3 className="font-display font-semibold text-foreground mb-1">
+                      Signal sonore
+                    </h3>
+                    <p className="text-sm text-muted-foreground leading-relaxed">
+                      Bip audio à chaque changement d'exercice et alerte à 3 secondes
+                      de la fin. Plus besoin de regarder l'écran en permanence.
                     </p>
                   </div>
                 </div>
                 <div className="flex items-start gap-4">
                   <div className="w-10 h-10 rounded-xl bg-green-500/10 flex items-center justify-center shrink-0">
-                    <Heart className="w-5 h-5 text-green-400" />
+                    <ImageIcon className="w-5 h-5 text-green-400" />
                   </div>
                   <div>
                     <h3 className="font-display font-semibold text-foreground mb-1">
-                      Instructions de coaching
+                      Illustrations de mouvements
                     </h3>
                     <p className="text-sm text-muted-foreground leading-relaxed">
-                      Chaque exercice est accompagné de consignes vocales
-                      détaillées : position, mouvement et motivation.
+                      Chaque exercice est accompagné d'une illustration montrant
+                      la position correcte et le mouvement à réaliser.
                     </p>
                   </div>
                 </div>
@@ -338,22 +387,22 @@ export default function Home() {
               transition={{ duration: 0.6, delay: 0.2 }}
               className="relative"
             >
-              <div className="aspect-square max-w-md mx-auto relative">
+              <div className="aspect-[3/4] max-w-md mx-auto relative">
                 <img
-                  src={AVATAR_IMG}
+                  src={COACH_PHOTO}
                   alt="Coach Mimi"
                   className="w-full h-full object-cover rounded-3xl"
                 />
-                <div className="absolute inset-0 rounded-3xl bg-gradient-to-t from-background/60 to-transparent" />
+                <div className="absolute inset-0 rounded-3xl bg-gradient-to-t from-background/80 via-transparent to-transparent" />
                 <div className="absolute bottom-6 left-6 right-6">
                   <span className="font-display text-xs uppercase tracking-[0.2em] text-red-400 block mb-1">
                     Votre coach
                   </span>
-                  <h3 className="font-display text-2xl font-bold text-foreground">
+                  <h3 className="font-display text-2xl font-bold text-white">
                     Coach Mimi
                   </h3>
-                  <p className="text-sm text-foreground/60 mt-1">
-                    Coach sportif fonctionnel &middot; Abidjan
+                  <p className="text-sm text-white/70 mt-1">
+                    Coach sportif fonctionnel &middot; 6 diplômes &middot; Abidjan
                   </p>
                 </div>
               </div>
@@ -375,7 +424,8 @@ export default function Home() {
               Prêt à transpirer ?
             </h2>
             <p className="text-muted-foreground text-lg mb-8 max-w-md mx-auto">
-              Lancez la séance et laissez-vous guider exercice par exercice.
+              1 heure de Pilates Full Body. Lancez la séance et laissez-vous
+              guider exercice par exercice.
             </p>
             <Button
               size="lg"
@@ -393,7 +443,7 @@ export default function Home() {
       <footer className="py-8 border-t border-border/10">
         <div className="container text-center">
           <p className="text-xs text-muted-foreground">
-            Coach Mimi &middot; Pilates-Strength &middot; Abidjan
+            Coach Mimi &middot; Pilates-Strength Full Body &middot; Abidjan
           </p>
           <p className="text-[10px] text-muted-foreground/50 mt-1">
             Inspiré du style de Marie Steffen - The Art of Health

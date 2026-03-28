@@ -1,7 +1,8 @@
 /*
  * Design: "Néon Fitness Flow" — Page de séance interactive
  * Layout cockpit: Timer en haut, exercice actif au centre, liste en sidebar
- * Mode mains libres avec défilement automatique
+ * Mode mains libres avec défilement automatique + signal sonore
+ * Séance complète 1h Full Body avec poids légers
  */
 
 import { useTimer } from "@/hooks/useTimer";
@@ -21,9 +22,10 @@ import {
   Trophy,
   Timer,
   Dumbbell,
+  Volume2,
 } from "lucide-react";
 import { useLocation } from "wouter";
-import { exercises, PHASE_LABELS } from "@/lib/exerciseData";
+import { exercises, PHASE_LABELS, TOTAL_DURATION, getTotalMainExercises } from "@/lib/exerciseData";
 
 const HERO_IMG =
   "https://d2xsxph8kpxj0f.cloudfront.net/310519663442254125/EDJjErcDe3f7pkvHdYd45d/hero-pilates-dark-eDrXjLic23sPpALmrZe8nq.webp";
@@ -51,6 +53,9 @@ export default function SessionPage() {
     return `${m}:${s.toString().padStart(2, "0")}`;
   };
 
+  const totalMainExercises = getTotalMainExercises();
+  const totalMinutes = Math.round(TOTAL_DURATION / 60);
+
   // Finished screen
   if (sessionState === "finished") {
     return (
@@ -68,14 +73,13 @@ export default function SessionPage() {
             Bravo !
           </h1>
           <p className="text-muted-foreground text-lg mb-2">
-            Séance Pilates Strength terminée
+            Séance Pilates Strength Full Body terminée
           </p>
           <p className="text-muted-foreground text-sm mb-8">
             Durée totale : {formatTime(totalElapsed)}
           </p>
           <p className="text-foreground/70 italic text-base mb-10 px-4">
-            "Bravo à tous pour cette séance Pilates Strength ! Pensez à bien
-            vous hydrater."
+            "Bravo à tous pour cette séance Pilates Strength d'une heure ! Vous avez travaillé tout le corps. Pensez à bien vous hydrater. À très bientôt avec Coach Mimi !"
           </p>
           <div className="flex gap-4 justify-center">
             <Button
@@ -122,17 +126,16 @@ export default function SessionPage() {
             <div className="flex items-center justify-center gap-2 mb-6">
               <Dumbbell className="w-5 h-5 text-red-400" />
               <span className="font-display text-xs uppercase tracking-[0.25em] text-red-400">
-                Pilates Strength
+                Pilates Strength Full Body
               </span>
             </div>
             <h1 className="font-display text-4xl md:text-5xl font-bold text-foreground mb-4 leading-tight">
               Séance Débutant
               <br />
-              <span className="text-red-400">avec Poids</span>
+              <span className="text-red-400">1 Heure avec Poids</span>
             </h1>
             <p className="text-muted-foreground text-base mb-8 leading-relaxed">
-              {exercises.filter((e) => !e.isTransition).length} exercices
-              &middot; ~24 min &middot; Haltères légers (1-2 kg)
+              {totalMainExercises} exercices &middot; ~{totalMinutes} min &middot; Haltères légers (1-2 kg)
             </p>
 
             {/* Quick info */}
@@ -142,22 +145,28 @@ export default function SessionPage() {
                 <span className="text-[10px] uppercase tracking-[0.15em] text-green-400 block">
                   Echauffement
                 </span>
-                <span className="text-xs text-muted-foreground">5 min</span>
+                <span className="text-xs text-muted-foreground">~8 min</span>
               </div>
               <div className="bg-card/60 backdrop-blur-sm rounded-xl p-4 border border-border/30">
                 <div className="w-3 h-3 rounded-full bg-red-400 mx-auto mb-2" />
                 <span className="text-[10px] uppercase tracking-[0.15em] text-red-400 block">
                   Workout
                 </span>
-                <span className="text-xs text-muted-foreground">15 min</span>
+                <span className="text-xs text-muted-foreground">~44 min</span>
               </div>
               <div className="bg-card/60 backdrop-blur-sm rounded-xl p-4 border border-border/30">
                 <div className="w-3 h-3 rounded-full bg-blue-400 mx-auto mb-2" />
                 <span className="text-[10px] uppercase tracking-[0.15em] text-blue-400 block">
                   Cool-down
                 </span>
-                <span className="text-xs text-muted-foreground">4 min</span>
+                <span className="text-xs text-muted-foreground">~8 min</span>
               </div>
+            </div>
+
+            {/* Sound notice */}
+            <div className="flex items-center justify-center gap-2 mb-6 text-muted-foreground">
+              <Volume2 className="w-4 h-4" />
+              <span className="text-xs">Signal sonore activé à chaque changement d'exercice</span>
             </div>
 
             <Button
@@ -225,7 +234,7 @@ export default function SessionPage() {
             <div className="flex items-center gap-2">
               <Timer className="w-3.5 h-3.5 text-muted-foreground" />
               <span className="font-display text-sm text-muted-foreground tracking-wider">
-                {formatTime(totalElapsed)}
+                {formatTime(totalElapsed)} / {formatTime(TOTAL_DURATION)}
               </span>
             </div>
             <span className="font-display text-xs uppercase tracking-[0.15em] text-muted-foreground">
@@ -323,7 +332,7 @@ export default function SessionPage() {
           <aside className="hidden lg:block w-72 shrink-0">
             <div className="sticky top-40">
               <h3 className="font-display text-xs uppercase tracking-[0.2em] text-muted-foreground mb-4">
-                Programme
+                Programme ({totalMainExercises} exercices)
               </h3>
               <ExerciseList currentIndex={currentIndex} />
             </div>
