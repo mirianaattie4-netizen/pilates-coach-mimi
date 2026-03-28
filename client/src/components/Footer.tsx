@@ -69,6 +69,12 @@ export default function Footer() {
               >
                 Mobilité Pure
               </Link>
+              <Link
+                href="/galerie"
+                className="block text-sm text-foreground/70 hover:text-foreground transition-colors"
+              >
+                Galerie d'exercices
+              </Link>
             </nav>
           </div>
 
