@@ -131,6 +131,51 @@ const galleryImages: GalleryImage[] = [
     description:
       "Allongée, mains derrière la tête, rotation du torse pour amener le coude vers le genou opposé. Sculpte la taille et renforce les obliques.",
   },
+  {
+    id: "pigeon",
+    src: "https://d2xsxph8kpxj0f.cloudfront.net/310519663442254125/EDJjErcDe3f7pkvHdYd45d/gallery-pigeon-6ynPaoMkJcQLWa4Dt2Dt4C.webp",
+    title: "Pigeon Profond",
+    category: "Stretching",
+    muscles: "Piriforme, Fessiers, Psoas",
+    description:
+      "Étirement profond des rotateurs de hanche. Jambe avant pliée, jambe arrière tendue, torse penché vers l'avant. Tenue longue de 60 secondes pour un relâchement maximal.",
+  },
+  {
+    id: "mermaid",
+    src: "https://d2xsxph8kpxj0f.cloudfront.net/310519663442254125/EDJjErcDe3f7pkvHdYd45d/gallery-mermaid-2DCtHjBxiATJgevJVHbRpG.webp",
+    title: "Mermaid Stretch",
+    category: "Mobilité",
+    muscles: "Obliques, Intercostaux, Grand dorsal",
+    description:
+      "Étirement latéral gracieux en position assise. Un bras s'étend au-dessus de la tête créant une belle courbe. Ouvre les côtes et étire tout le flanc.",
+  },
+  {
+    id: "spinetwist",
+    src: "https://d2xsxph8kpxj0f.cloudfront.net/310519663442254125/EDJjErcDe3f7pkvHdYd45d/gallery-spine-twist-Hi7wARMA4S7M3XxD4VLqy4.webp",
+    title: "Spine Twist",
+    category: "Mobilité",
+    muscles: "Obliques, Colonne thoracique",
+    description:
+      "Rotation du torse en position assise, bras en T. Le bassin reste ancré au sol pendant que la colonne thoracique tourne. Améliore la mobilité en rotation.",
+  },
+  {
+    id: "openbook",
+    src: "https://d2xsxph8kpxj0f.cloudfront.net/310519663442254125/EDJjErcDe3f7pkvHdYd45d/gallery-open-book-n7GnWmCEHcEHehzRZ7fUAH.webp",
+    title: "Open Book",
+    category: "Mobilité",
+    muscles: "Colonne thoracique, Pectoraux",
+    description:
+      "Rotation thoracique sur le côté. Le bras s'ouvre comme un livre vers le plafond, le regard suit la main. Ouvre la poitrine et mobilise la colonne.",
+  },
+  {
+    id: "happybaby",
+    src: "https://d2xsxph8kpxj0f.cloudfront.net/310519663442254125/EDJjErcDe3f7pkvHdYd45d/gallery-happy-baby-geyHojVSRb6tFwkLbvu62g.webp",
+    title: "Happy Baby",
+    category: "Stretching",
+    muscles: "Adducteurs, Hanches",
+    description:
+      "Allongée sur le dos, genoux vers les aisselles, mains sur les pieds. Bercement doux pour ouvrir les hanches. Étirement profond et relaxant.",
+  },
 ];
 
 const galleryVideos: GalleryVideo[] = [
@@ -182,6 +227,7 @@ const categoryColors: Record<string, string> = {
   "Hanches & Obliques": "from-violet-500/20 to-purple-500/20 text-violet-300",
   Mobilité: "from-emerald-500/20 to-teal-500/20 text-emerald-300",
   Obliques: "from-sky-500/20 to-indigo-500/20 text-sky-300",
+  Stretching: "from-purple-500/20 to-fuchsia-500/20 text-purple-300",
   Débutant: "from-green-500/20 to-emerald-500/20 text-green-300",
   Intermédiaire: "from-yellow-500/20 to-amber-500/20 text-yellow-300",
 };

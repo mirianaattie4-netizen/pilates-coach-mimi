@@ -1,11 +1,17 @@
 /*
- * Registre central des 3 séances Coach Mimi
+ * Registre central des 9 séances Coach Mimi
  */
 
 import type { SessionConfig } from "./sessionTypes";
 import { exercises as session1Exercises, PHASE_LABELS as session1Labels } from "./exerciseData";
 import { session2 } from "./session2Data";
 import { session3 } from "./session3Data";
+import { session4 } from "./session4Data";
+import { session5 } from "./session5Data";
+import { session6 } from "./session6Data";
+import { session7 } from "./session7Data";
+import { session8 } from "./session8Data";
+import { session9 } from "./session9Data";
 
 export const session1: SessionConfig = {
   id: "classique",
@@ -22,7 +28,17 @@ export const session1: SessionConfig = {
   finishMessage: "Bravo pour cette séance de Pilates Classique ! Vous avez travaillé la mobilité, la force profonde, l'équilibre et la souplesse. Pensez à bien vous hydrater. À très bientôt avec Coach Mimi !",
 };
 
-export const allSessions: SessionConfig[] = [session1, session2, session3];
+export const allSessions: SessionConfig[] = [
+  session1,
+  session2,
+  session3,
+  session4,
+  session5,
+  session6,
+  session7,
+  session8,
+  session9,
+];
 
 export function getSessionById(id: string): SessionConfig | undefined {
   return allSessions.find((s) => s.id === id);

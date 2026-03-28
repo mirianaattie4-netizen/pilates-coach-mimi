@@ -1,6 +1,6 @@
 /*
- * Design: "Néon Fitness Flow" — Page d'accueil avec catalogue de 3 séances
- * Hero sombre avec vidéo, photo Coach Mimi, sélecteur de séances
+ * Design: "Néon Fitness Flow" — Page d'accueil avec catalogue de 9 séances
+ * Hero sombre avec vidéo, photo Coach Mimi, sélecteur de séances par catégorie
  */
 
 import { Button } from "@/components/ui/button";
@@ -18,6 +18,10 @@ import {
   Sparkles,
   Wind,
   Activity,
+  Target,
+  Dumbbell,
+  ArrowUpRight,
+  Mic,
 } from "lucide-react";
 import { useLocation } from "wouter";
 import { useRef, useState } from "react";
@@ -28,62 +32,120 @@ const HERO_VIDEO =
   "https://d2xsxph8kpxj0f.cloudfront.net/310519663442254125/EDJjErcDe3f7pkvHdYd45d/jardindeden_2103c822.mp4";
 const HERO_IMG =
   "https://d2xsxph8kpxj0f.cloudfront.net/310519663442254125/EDJjErcDe3f7pkvHdYd45d/hero-pilates-dark-CZJEWSuRmdsaPbzNWyDpUx.png";
-const WARMUP_IMG =
-  "https://d2xsxph8kpxj0f.cloudfront.net/310519663442254125/EDJjErcDe3f7pkvHdYd45d/warmup-phase-iSfdrwRGbXZhdPcMxwmxMe.webp";
-const WORKOUT_IMG =
-  "https://d2xsxph8kpxj0f.cloudfront.net/310519663442254125/EDJjErcDe3f7pkvHdYd45d/workout-phase-dCquAFYUfWGuPVnKqNuaQV.webp";
-const COOLDOWN_IMG =
-  "https://d2xsxph8kpxj0f.cloudfront.net/310519663442254125/EDJjErcDe3f7pkvHdYd45d/cooldown-phase-Js4T7k9uzVys8RZyKVjwgM.webp";
 const COACH_PHOTO =
   "https://d2xsxph8kpxj0f.cloudfront.net/310519663442254125/EDJjErcDe3f7pkvHdYd45d/coach-mimi-photo_6625e8f3.jpeg";
 
-// Session card styling
-const SESSION_CARD_STYLES: Record<string, {
+/* ─── Session card color mapping ─── */
+const SESSION_COLORS: Record<string, {
   gradient: string;
   border: string;
   icon: typeof Flame;
   iconColor: string;
   badgeColor: string;
   ctaGradient: string;
-  glowClass: string;
-  image: string;
 }> = {
   classique: {
     gradient: "from-emerald-500/10 via-transparent to-transparent",
-    border: "border-emerald-500/30 hover:border-emerald-400/60",
+    border: "border-emerald-500/20 hover:border-emerald-400/50",
     icon: Heart,
     iconColor: "text-emerald-400",
     badgeColor: "bg-emerald-500/15 text-emerald-400",
     ctaGradient: "from-emerald-500 to-green-500",
-    glowClass: "glow-green",
-    image: WARMUP_IMG,
   },
   contemporain: {
     gradient: "from-orange-500/10 via-transparent to-transparent",
-    border: "border-orange-500/30 hover:border-orange-400/60",
+    border: "border-orange-500/20 hover:border-orange-400/50",
     icon: Flame,
     iconColor: "text-orange-400",
     badgeColor: "bg-orange-500/15 text-orange-400",
     ctaGradient: "from-orange-500 to-amber-500",
-    glowClass: "glow-coral",
-    image: WORKOUT_IMG,
   },
   mobilite: {
     gradient: "from-cyan-500/10 via-transparent to-transparent",
-    border: "border-cyan-500/30 hover:border-cyan-400/60",
+    border: "border-cyan-500/20 hover:border-cyan-400/50",
     icon: Wind,
     iconColor: "text-cyan-400",
     badgeColor: "bg-cyan-500/15 text-cyan-400",
     ctaGradient: "from-cyan-500 to-blue-500",
-    glowClass: "glow-blue",
-    image: COOLDOWN_IMG,
+  },
+  avance: {
+    gradient: "from-red-500/10 via-transparent to-transparent",
+    border: "border-red-500/20 hover:border-red-400/50",
+    icon: Zap,
+    iconColor: "text-red-400",
+    badgeColor: "bg-red-500/15 text-red-400",
+    ctaGradient: "from-red-500 to-rose-500",
+  },
+  "bas-du-corps": {
+    gradient: "from-pink-500/10 via-transparent to-transparent",
+    border: "border-pink-500/20 hover:border-pink-400/50",
+    icon: Target,
+    iconColor: "text-pink-400",
+    badgeColor: "bg-pink-500/15 text-pink-400",
+    ctaGradient: "from-pink-500 to-rose-500",
+  },
+  "haut-du-corps": {
+    gradient: "from-violet-500/10 via-transparent to-transparent",
+    border: "border-violet-500/20 hover:border-violet-400/50",
+    icon: Dumbbell,
+    iconColor: "text-violet-400",
+    badgeColor: "bg-violet-500/15 text-violet-400",
+    ctaGradient: "from-violet-500 to-purple-500",
+  },
+  "mobilite-hanches": {
+    gradient: "from-teal-500/10 via-transparent to-transparent",
+    border: "border-teal-500/20 hover:border-teal-400/50",
+    icon: Activity,
+    iconColor: "text-teal-400",
+    badgeColor: "bg-teal-500/15 text-teal-400",
+    ctaGradient: "from-teal-500 to-cyan-500",
+  },
+  "mobilite-colonne": {
+    gradient: "from-amber-500/10 via-transparent to-transparent",
+    border: "border-amber-500/20 hover:border-amber-400/50",
+    icon: Shield,
+    iconColor: "text-amber-400",
+    badgeColor: "bg-amber-500/15 text-amber-400",
+    ctaGradient: "from-amber-500 to-yellow-500",
+  },
+  stretching: {
+    gradient: "from-fuchsia-500/10 via-transparent to-transparent",
+    border: "border-fuchsia-500/20 hover:border-fuchsia-400/50",
+    icon: Sparkles,
+    iconColor: "text-fuchsia-400",
+    badgeColor: "bg-fuchsia-500/15 text-fuchsia-400",
+    ctaGradient: "from-fuchsia-500 to-purple-500",
   },
 };
+
+const defaultColor = SESSION_COLORS.classique;
+
+/* ─── Category filter ─── */
+type Category = "all" | "pilates" | "mobilite" | "stretching";
+
+const CATEGORIES: { key: Category; label: string; color: string }[] = [
+  { key: "all", label: "Toutes", color: "from-red-500/20 to-orange-500/20 text-orange-300" },
+  { key: "pilates", label: "Pilates", color: "from-emerald-500/20 to-green-500/20 text-emerald-300" },
+  { key: "mobilite", label: "Mobilité", color: "from-cyan-500/20 to-blue-500/20 text-cyan-300" },
+  { key: "stretching", label: "Stretching", color: "from-fuchsia-500/20 to-purple-500/20 text-fuchsia-300" },
+];
+
+function getSessionCategory(id: string): Category {
+  if (["classique", "contemporain", "avance", "bas-du-corps", "haut-du-corps"].includes(id)) return "pilates";
+  if (["mobilite", "mobilite-hanches", "mobilite-colonne"].includes(id)) return "mobilite";
+  if (id === "stretching") return "stretching";
+  return "pilates";
+}
 
 export default function Home() {
   const [, setLocation] = useLocation();
   const videoRef = useRef<HTMLVideoElement>(null);
   const [videoLoaded, setVideoLoaded] = useState(false);
+  const [activeCategory, setActiveCategory] = useState<Category>("all");
+
+  const filteredSessions = activeCategory === "all"
+    ? allSessions
+    : allSessions.filter((s) => getSessionCategory(s.id) === activeCategory);
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -128,7 +190,7 @@ export default function Home() {
               </div>
 
               <h1 className="font-display text-5xl md:text-7xl font-bold leading-[0.95] mb-6">
-                <span className="text-foreground">3 Séances</span>
+                <span className="text-foreground">9 Séances</span>
                 <br />
                 <span className="text-foreground">Pilates &amp; Mobilité</span>
                 <br />
@@ -138,15 +200,15 @@ export default function Home() {
               </h1>
 
               <p className="text-lg text-foreground/60 leading-relaxed mb-8 max-w-lg">
-                Choisissez votre séance parmi 3 programmes complets : Pilates Classique,
-                Pilates Contemporain ou Mobilité Pure. Timer, illustrations, signal sonore
-                et coaching en temps réel.
+                Pilates Classique, Avancé, Bas du Corps, Haut du Corps, Contemporain, 
+                Mobilité Hanches, Colonne, et Stretching Profond. Timer, illustrations, 
+                signal sonore, lecteur vocal et coaching en temps réel.
               </p>
 
               <div className="flex flex-wrap gap-6 mb-10">
                 <div className="flex items-center gap-2">
                   <Clock className="w-4 h-4 text-muted-foreground" />
-                  <span className="text-sm text-foreground/70">3 séances</span>
+                  <span className="text-sm text-foreground/70">9 séances</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Heart className="w-4 h-4 text-muted-foreground" />
@@ -157,8 +219,8 @@ export default function Home() {
                   <span className="text-sm text-foreground/70">Signal sonore</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <ImageIcon className="w-4 h-4 text-muted-foreground" />
-                  <span className="text-sm text-foreground/70">Illustrations</span>
+                  <Mic className="w-4 h-4 text-muted-foreground" />
+                  <span className="text-sm text-foreground/70">Lecteur vocal</span>
                 </div>
               </div>
 
@@ -196,7 +258,7 @@ export default function Home() {
             whileInView={{ y: 0, opacity: 1 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
-            className="text-center mb-16"
+            className="text-center mb-12"
           >
             <span className="font-display text-xs uppercase tracking-[0.25em] text-muted-foreground block mb-3">
               Catalogue de séances
@@ -205,14 +267,37 @@ export default function Home() {
               Choisissez votre programme
             </h2>
             <p className="text-muted-foreground max-w-xl mx-auto">
-              3 séances complètes au sol, sans matériel, guidées pas à pas avec timer,
-              illustrations et signal sonore.
+              9 séances complètes au sol, sans matériel, guidées pas à pas avec timer,
+              illustrations, signal sonore et lecteur vocal.
             </p>
           </motion.div>
 
-          <div className="grid md:grid-cols-3 gap-8">
-            {allSessions.map((session, idx) => {
-              const style = SESSION_CARD_STYLES[session.id] || SESSION_CARD_STYLES.classique;
+          {/* Category Filter */}
+          <div className="flex flex-wrap items-center justify-center gap-3 mb-12">
+            {CATEGORIES.map((cat) => (
+              <button
+                key={cat.key}
+                onClick={() => setActiveCategory(cat.key)}
+                className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-medium transition-all ${
+                  activeCategory === cat.key
+                    ? `bg-gradient-to-r ${cat.color} shadow-lg`
+                    : "bg-card/50 text-muted-foreground hover:text-foreground hover:bg-card"
+                }`}
+              >
+                {cat.label}
+                {activeCategory === cat.key && (
+                  <span className="text-xs opacity-70">
+                    ({cat.key === "all" ? allSessions.length : allSessions.filter(s => getSessionCategory(s.id) === cat.key).length})
+                  </span>
+                )}
+              </button>
+            ))}
+          </div>
+
+          {/* Sessions Grid */}
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredSessions.map((session, idx) => {
+              const style = SESSION_COLORS[session.id] || defaultColor;
               const Icon = style.icon;
               const totalMin = Math.round(session.totalDuration / 60);
               const mainExCount = session.exercises.filter(e => !e.isTransition).length;
@@ -220,82 +305,63 @@ export default function Home() {
               return (
                 <motion.div
                   key={session.id}
-                  initial={{ y: 40, opacity: 0 }}
+                  initial={{ y: 30, opacity: 0 }}
                   whileInView={{ y: 0, opacity: 1 }}
                   viewport={{ once: true }}
-                  transition={{ duration: 0.5, delay: idx * 0.15 }}
-                  className={`group relative rounded-2xl overflow-hidden border bg-card transition-all duration-500 ${style.border}`}
+                  transition={{ duration: 0.4, delay: idx * 0.08 }}
+                  className={`group relative rounded-2xl overflow-hidden border bg-card transition-all duration-500 ${style.border} cursor-pointer`}
+                  onClick={() => setLocation(`/session/${session.id}`)}
                 >
-                  {/* Card image */}
-                  <div className="aspect-[16/10] overflow-hidden relative">
-                    <img
-                      src={style.image}
-                      alt={session.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-card via-card/60 to-transparent" />
-                    {/* Level badge */}
-                    <div className={`absolute top-4 left-4 px-3 py-1.5 rounded-full text-[10px] font-display uppercase tracking-[0.15em] font-bold ${style.badgeColor}`}>
-                      {session.level}
-                    </div>
-                    {/* Duration badge */}
-                    <div className="absolute top-4 right-4 px-3 py-1.5 rounded-full bg-black/50 backdrop-blur-sm text-[10px] font-display text-white/80 flex items-center gap-1.5">
-                      <Clock className="w-3 h-3" />
-                      ~{totalMin} min
-                    </div>
-                  </div>
+                  {/* Top gradient accent */}
+                  <div className={`h-1 bg-gradient-to-r ${style.ctaGradient}`} />
 
                   {/* Card content */}
                   <div className={`p-6 bg-gradient-to-b ${style.gradient}`}>
-                    <div className="flex items-center gap-3 mb-3">
-                      <div className={`w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center ${style.iconColor}`}>
+                    {/* Header */}
+                    <div className="flex items-start gap-3 mb-4">
+                      <div className={`w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center shrink-0 ${style.iconColor}`}>
                         <Icon className="w-5 h-5" />
                       </div>
-                      <div>
-                        <h3 className="font-display text-xl font-bold text-foreground leading-tight">
+                      <div className="flex-1">
+                        <h3 className="font-display text-lg font-bold text-foreground leading-tight">
                           {session.title}
                         </h3>
                         <span className="text-xs text-muted-foreground">{session.subtitle}</span>
                       </div>
+                      <ArrowUpRight className="w-4 h-4 text-muted-foreground/30 group-hover:text-foreground/60 transition-colors shrink-0 mt-1" />
                     </div>
 
-                    <p className="text-sm text-muted-foreground leading-relaxed mb-5 line-clamp-3">
+                    <p className="text-sm text-muted-foreground leading-relaxed mb-4 line-clamp-2">
                       {session.description}
                     </p>
 
                     {/* Stats row */}
-                    <div className="flex items-center gap-3 mb-6 text-xs text-muted-foreground">
+                    <div className="flex items-center gap-3 mb-4 text-xs text-muted-foreground">
+                      <span className={`px-2.5 py-1 rounded-full text-[10px] font-display uppercase tracking-wider font-bold ${style.badgeColor}`}>
+                        {session.level}
+                      </span>
+                      <div className="flex items-center gap-1">
+                        <Clock className="w-3 h-3" />
+                        <span>~{totalMin} min</span>
+                      </div>
                       <div className="flex items-center gap-1">
                         <Activity className="w-3 h-3" />
-                        <span>{mainExCount} exercices</span>
+                        <span>{mainExCount} ex.</span>
                       </div>
-                      <span className="text-border">&middot;</span>
-                      <span>{session.equipment}</span>
                     </div>
 
                     {/* Phase pills */}
-                    <div className="flex flex-wrap gap-2 mb-6">
-                      <span className="text-[10px] px-2.5 py-1 rounded-full bg-green-500/10 text-green-400 font-display uppercase tracking-wider">
+                    <div className="flex flex-wrap gap-1.5">
+                      <span className="text-[9px] px-2 py-0.5 rounded-full bg-green-500/10 text-green-400/80 font-display uppercase tracking-wider">
                         {session.phaseLabels.warmup}
                       </span>
-                      <span className="text-[10px] px-2.5 py-1 rounded-full bg-red-500/10 text-red-400 font-display uppercase tracking-wider">
+                      <span className="text-[9px] px-2 py-0.5 rounded-full bg-red-500/10 text-red-400/80 font-display uppercase tracking-wider">
                         {session.phaseLabels.workout}
                       </span>
-                      <span className="text-[10px] px-2.5 py-1 rounded-full bg-blue-500/10 text-blue-400 font-display uppercase tracking-wider">
+                      <span className="text-[9px] px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-400/80 font-display uppercase tracking-wider">
                         {session.phaseLabels.cooldown}
                       </span>
                     </div>
-
-                    {/* CTA */}
-                    <Button
-                      size="lg"
-                      onClick={() => setLocation(`/session/${session.id}`)}
-                      className={`w-full font-display bg-gradient-to-r ${style.ctaGradient} text-white hover:opacity-90 rounded-xl group/btn`}
-                    >
-                      <Play className="w-4 h-4 mr-2 group-hover/btn:scale-110 transition-transform" />
-                      Lancer la séance
-                      <ChevronRight className="w-4 h-4 ml-auto group-hover/btn:translate-x-1 transition-transform" />
-                    </Button>
                   </div>
                 </motion.div>
               );
@@ -333,7 +399,7 @@ export default function Home() {
                     </h3>
                     <p className="text-sm text-muted-foreground leading-relaxed">
                       Compte à rebours visuel pour chaque exercice. 45 secondes
-                      d'effort, transitions guidées. 3 séances complètes disponibles.
+                      d'effort, transitions guidées. 9 séances complètes disponibles.
                     </p>
                   </div>
                 </div>
@@ -352,6 +418,20 @@ export default function Home() {
                   </div>
                 </div>
                 <div className="flex items-start gap-4">
+                  <div className="w-10 h-10 rounded-xl bg-blue-500/10 flex items-center justify-center shrink-0">
+                    <Mic className="w-5 h-5 text-blue-400" />
+                  </div>
+                  <div>
+                    <h3 className="font-display font-semibold text-foreground mb-1">
+                      Lecteur vocal
+                    </h3>
+                    <p className="text-sm text-muted-foreground leading-relaxed">
+                      Les instructions de coaching sont lues à voix haute automatiquement.
+                      Activez/désactivez d'un clic. Idéal pour coacher sans regarder l'écran.
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-4">
                   <div className="w-10 h-10 rounded-xl bg-green-500/10 flex items-center justify-center shrink-0">
                     <ImageIcon className="w-5 h-5 text-green-400" />
                   </div>
@@ -362,20 +442,6 @@ export default function Home() {
                     <p className="text-sm text-muted-foreground leading-relaxed">
                       Chaque exercice est accompagné d'une illustration montrant
                       la position correcte et le mouvement à réaliser.
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 rounded-xl bg-blue-500/10 flex items-center justify-center shrink-0">
-                    <Shield className="w-5 h-5 text-blue-400" />
-                  </div>
-                  <div>
-                    <h3 className="font-display font-semibold text-foreground mb-1">
-                      Tous niveaux
-                    </h3>
-                    <p className="text-sm text-muted-foreground leading-relaxed">
-                      Du débutant à l'intermédiaire, chaque séance propose des mouvements
-                      adaptés avec des instructions de coaching détaillées.
                     </p>
                   </div>
                 </div>
@@ -426,28 +492,28 @@ export default function Home() {
               Prête à transpirer ?
             </h2>
             <p className="text-muted-foreground text-lg mb-8 max-w-md mx-auto">
-              3 séances de Pilates au sol et mobilité. Choisissez votre programme
+              9 séances de Pilates, Mobilité et Stretching au sol. Choisissez votre programme
               et laissez-vous guider exercice par exercice.
             </p>
             <div className="flex flex-col sm:flex-row items-center gap-4 justify-center">
-            <Button
-              size="lg"
-              onClick={() => {
-                document.getElementById("seances")?.scrollIntoView({ behavior: "smooth" });
-              }}
-              className="font-display text-lg px-10 py-7 bg-gradient-to-r from-red-500 to-orange-500 text-white hover:from-red-600 hover:to-orange-600 glow-coral rounded-2xl group"
-            >
-              <Play className="w-5 h-5 mr-3 group-hover:scale-110 transition-transform" />
-              Voir les séances
-            </Button>
-            <Button
-              size="lg"
-              onClick={() => setLocation('/galerie')}
-              className="font-display text-lg px-10 py-7 bg-white/5 border border-white/10 text-white hover:bg-white/10 rounded-2xl group"
-            >
-              <ImageIcon className="w-5 h-5 mr-3 group-hover:scale-110 transition-transform" />
-              Galerie d'exercices
-            </Button>
+              <Button
+                size="lg"
+                onClick={() => {
+                  document.getElementById("seances")?.scrollIntoView({ behavior: "smooth" });
+                }}
+                className="font-display text-lg px-10 py-7 bg-gradient-to-r from-red-500 to-orange-500 text-white hover:from-red-600 hover:to-orange-600 glow-coral rounded-2xl group"
+              >
+                <Play className="w-5 h-5 mr-3 group-hover:scale-110 transition-transform" />
+                Voir les séances
+              </Button>
+              <Button
+                size="lg"
+                onClick={() => setLocation('/galerie')}
+                className="font-display text-lg px-10 py-7 bg-white/5 border border-white/10 text-white hover:bg-white/10 rounded-2xl group"
+              >
+                <ImageIcon className="w-5 h-5 mr-3 group-hover:scale-110 transition-transform" />
+                Galerie d'exercices
+              </Button>
             </div>
           </motion.div>
         </div>
