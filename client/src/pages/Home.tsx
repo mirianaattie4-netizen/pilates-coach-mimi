@@ -22,6 +22,7 @@ import {
 import { useLocation } from "wouter";
 import { useRef, useState } from "react";
 import { allSessions } from "@/lib/sessions";
+import Footer from "@/components/Footer";
 
 const HERO_VIDEO =
   "https://d2xsxph8kpxj0f.cloudfront.net/310519663442254125/EDJjErcDe3f7pkvHdYd45d/jardindeden_2103c822.mp4";
@@ -121,7 +122,8 @@ export default function Home() {
                   <Flame className="w-4 h-4 text-red-400" />
                 </div>
                 <span className="font-display text-xs uppercase tracking-[0.25em] text-red-400 font-medium">
-                  Pilates &middot; Mobilité &middot; Coach Mimi
+                  Pilates &middot; Mobilité &middot;{" "}
+                  <a href="/a-propos" className="underline underline-offset-2 hover:text-red-300 transition-colors">Coach Mimi</a>
                 </span>
               </div>
 
@@ -442,16 +444,7 @@ export default function Home() {
       </section>
 
       {/* Footer */}
-      <footer className="py-8 border-t border-border/10">
-        <div className="container text-center">
-          <p className="text-xs text-muted-foreground">
-            Coach Mimi &middot; Pilates au Sol &amp; Mobilité &middot; Abidjan
-          </p>
-          <p className="text-[10px] text-muted-foreground/50 mt-1">
-            3 séances complètes &middot; Pilates Classique &middot; Pilates Contemporain &middot; Mobilité Pure
-          </p>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }
