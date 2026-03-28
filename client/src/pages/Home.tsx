@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import {
   Play,
-  Dumbbell,
   Clock,
   Flame,
   Heart,
@@ -79,7 +78,7 @@ export default function Home() {
                   <Flame className="w-4 h-4 text-red-400" />
                 </div>
                 <span className="font-display text-xs uppercase tracking-[0.25em] text-red-400 font-medium">
-                  Pilates-Strength &middot; Débutant &middot; Full Body
+                  Pilates au Sol &middot; Mobilité &middot; Débutant
                 </span>
               </div>
 
@@ -87,18 +86,18 @@ export default function Home() {
               <h1 className="font-display text-5xl md:text-7xl font-bold leading-[0.95] mb-6">
                 <span className="text-foreground">1 Heure de</span>
                 <br />
-                <span className="text-foreground">Pilates avec</span>
+                <span className="text-foreground">Pilates au Sol</span>
                 <br />
                 <span className="bg-gradient-to-r from-red-400 via-orange-400 to-amber-400 bg-clip-text text-transparent">
-                  Poids Légers
+                  &amp; Mobilité
                 </span>
               </h1>
 
               {/* Description */}
               <p className="text-lg text-foreground/60 leading-relaxed mb-8 max-w-lg">
-                Séance complète Full Body guidée par Coach Mimi. 60 exercices
-                avec timer, illustrations de mouvements, signal sonore et
-                instructions de coaching en temps réel.
+                Séance complète de Pilates au sol et mobilité guidée par Coach Mimi.
+                60 exercices au tapis, sans matériel, avec timer, illustrations,
+                signal sonore et instructions de coaching en temps réel.
               </p>
 
               {/* Stats */}
@@ -108,9 +107,9 @@ export default function Home() {
                   <span className="text-sm text-foreground/70">60 min</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Dumbbell className="w-4 h-4 text-muted-foreground" />
+                  <Heart className="w-4 h-4 text-muted-foreground" />
                   <span className="text-sm text-foreground/70">
-                    Haltères 1-2 kg
+                    Tapis uniquement
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
@@ -173,7 +172,7 @@ export default function Home() {
               Structure de la séance
             </span>
             <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground">
-              3 phases, 60 exercices, 1 heure
+              3 phases, 60 exercices au sol, 1 heure
             </h2>
           </motion.div>
 
@@ -205,16 +204,16 @@ export default function Home() {
                   Echauffement & Mobilité
                 </h3>
                 <p className="text-sm text-muted-foreground leading-relaxed mb-3">
-                  Déverrouiller les articulations et préparer la colonne
-                  vertébrale avec des exercices de mobilité 90/90, Cat-Cow et
-                  Thread the Needle.
+                  Respiration Pilates, bascule du bassin, pont articulé,
+                  Cat-Cow, Thread the Needle, cercles de hanches et rotations
+                  pour mobiliser toute la colonne.
                 </p>
                 <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                  <span>8 exercices</span>
+                  <span>10 exercices</span>
                   <span>&middot;</span>
-                  <span>8 min</span>
+                  <span>10 min</span>
                   <span>&middot;</span>
-                  <span>Sans poids</span>
+                  <span>Mobilité</span>
                 </div>
               </div>
             </motion.div>
@@ -243,18 +242,18 @@ export default function Home() {
                   </span>
                 </div>
                 <h3 className="font-display text-xl font-bold text-foreground mb-2">
-                  Pilates Strength Full Body
+                  Pilates au Sol
                 </h3>
                 <p className="text-sm text-muted-foreground leading-relaxed mb-3">
-                  7 blocs de renforcement : abdos profonds, fessiers, cuisses,
-                  haut du corps, épaules, core et finisher.
+                             The Hundred, Roll-Up, Criss-Cross, Swimming, Teaser,
+                  planches, ponts, Bird Dog et série fessiers au sol.
                 </p>
                 <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                  <span>43 exercices</span>
+                  <span>40 exercices</span>
                   <span>&middot;</span>
-                  <span>44 min</span>
+                  <span>42 min</span>
                   <span>&middot;</span>
-                  <span>Avec poids</span>
+                  <span>Au tapis</span>
                 </div>
               </div>
             </motion.div>
@@ -290,9 +289,9 @@ export default function Home() {
                   relaxation finale en Savasana.
                 </p>
                 <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                  <span>9 exercices</span>
+                  <span>10 exercices</span>
                   <span>&middot;</span>
-                  <span>9 min</span>
+                  <span>10 min</span>
                   <span>&middot;</span>
                   <span>Étirements</span>
                 </div>
@@ -424,8 +423,8 @@ export default function Home() {
               Prêt à transpirer ?
             </h2>
             <p className="text-muted-foreground text-lg mb-8 max-w-md mx-auto">
-              1 heure de Pilates Full Body. Lancez la séance et laissez-vous
-              guider exercice par exercice.
+              1 heure de Pilates au sol et mobilité. Lancez la séance
+              et laissez-vous guider exercice par exercice.
             </p>
             <Button
               size="lg"
@@ -443,10 +442,10 @@ export default function Home() {
       <footer className="py-8 border-t border-border/10">
         <div className="container text-center">
           <p className="text-xs text-muted-foreground">
-            Coach Mimi &middot; Pilates-Strength Full Body &middot; Abidjan
+            Coach Mimi &middot; Pilates au Sol &amp; Mobilité &middot; Abidjan
           </p>
           <p className="text-[10px] text-muted-foreground/50 mt-1">
-            Inspiré du style de Marie Steffen - The Art of Health
+            Séance Pilates au sol &middot; Niveau Débutant
           </p>
         </div>
       </footer>

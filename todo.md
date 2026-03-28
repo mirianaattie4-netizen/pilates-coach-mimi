@@ -1,8 +1,11 @@
-# TODO - Mise à jour Pilates Coach Mimi
+# TODO - Refonte Pilates au Sol + Mobilité
 
 ## Modifications demandées
-- [ ] Restructurer la séance pour 1 heure complète (au lieu de ~24 min)
-- [ ] Full body avec poids légers — couvrir tous les groupes musculaires
-- [ ] Ajouter des photos/images de mouvements pour chaque exercice
-- [ ] Intégrer un signal sonore (bip) à chaque changement d'exercice
-- [ ] Tester le tout et livrer
+- [ ] Concevoir programme 1h Pilates mat classique + mobilité (SANS poids)
+- [ ] Réécrire exerciseData.ts avec les vrais exercices Pilates au sol
+- [ ] Générer nouvelles images d'exercices Pilates au sol
+- [ ] Mettre à jour imageUrls.ts avec les nouvelles images
+- [ ] Mettre à jour Home.tsx (titre, description, phases — supprimer toute mention de poids)
+- [ ] Mettre à jour SessionPage.tsx (supprimer mention haltères/poids)
+- [ ] Tester le site complet
+- [ ] Sauvegarder checkpoint et livrer

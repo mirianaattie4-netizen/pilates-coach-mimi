@@ -2,7 +2,7 @@
  * Design: "Néon Fitness Flow" — Page de séance interactive
  * Layout cockpit: Timer en haut, exercice actif au centre, liste en sidebar
  * Mode mains libres avec défilement automatique + signal sonore
- * Séance complète 1h Full Body avec poids légers
+ * Séance complète 1h Pilates au Sol & Mobilité
  */
 
 import { useTimer } from "@/hooks/useTimer";
@@ -21,7 +21,7 @@ import {
   ChevronLeft,
   Trophy,
   Timer,
-  Dumbbell,
+  Heart,
   Volume2,
 } from "lucide-react";
 import { useLocation } from "wouter";
@@ -73,13 +73,13 @@ export default function SessionPage() {
             Bravo !
           </h1>
           <p className="text-muted-foreground text-lg mb-2">
-            Séance Pilates Strength Full Body terminée
+            Séance Pilates au Sol & Mobilité terminée
           </p>
           <p className="text-muted-foreground text-sm mb-8">
             Durée totale : {formatTime(totalElapsed)}
           </p>
           <p className="text-foreground/70 italic text-base mb-10 px-4">
-            "Bravo à tous pour cette séance Pilates Strength d'une heure ! Vous avez travaillé tout le corps. Pensez à bien vous hydrater. À très bientôt avec Coach Mimi !"
+            "Bravo à tous pour cette magnifique séance de Pilates au sol d'une heure ! Vous avez travaillé la mobilité, la force profonde, l'équilibre et la souplesse. Pensez à bien vous hydrater. À très bientôt avec Coach Mimi !"
           </p>
           <div className="flex gap-4 justify-center">
             <Button
@@ -124,18 +124,18 @@ export default function SessionPage() {
             className="text-center max-w-lg"
           >
             <div className="flex items-center justify-center gap-2 mb-6">
-              <Dumbbell className="w-5 h-5 text-red-400" />
+              <Heart className="w-5 h-5 text-red-400" />
               <span className="font-display text-xs uppercase tracking-[0.25em] text-red-400">
-                Pilates Strength Full Body
+                Pilates au Sol & Mobilité
               </span>
             </div>
             <h1 className="font-display text-4xl md:text-5xl font-bold text-foreground mb-4 leading-tight">
               Séance Débutant
               <br />
-              <span className="text-red-400">1 Heure avec Poids</span>
+              <span className="text-red-400">1 Heure au Tapis</span>
             </h1>
             <p className="text-muted-foreground text-base mb-8 leading-relaxed">
-              {totalMainExercises} exercices &middot; ~{totalMinutes} min &middot; Haltères légers (1-2 kg)
+              {totalMainExercises} exercices &middot; ~{totalMinutes} min &middot; Tapis uniquement
             </p>
 
             {/* Quick info */}
@@ -145,21 +145,21 @@ export default function SessionPage() {
                 <span className="text-[10px] uppercase tracking-[0.15em] text-green-400 block">
                   Echauffement
                 </span>
-                <span className="text-xs text-muted-foreground">~8 min</span>
+                <span className="text-xs text-muted-foreground">~10 min</span>
               </div>
               <div className="bg-card/60 backdrop-blur-sm rounded-xl p-4 border border-border/30">
                 <div className="w-3 h-3 rounded-full bg-red-400 mx-auto mb-2" />
                 <span className="text-[10px] uppercase tracking-[0.15em] text-red-400 block">
-                  Workout
+                  Pilates au Sol
                 </span>
-                <span className="text-xs text-muted-foreground">~44 min</span>
+                <span className="text-xs text-muted-foreground">~42 min</span>
               </div>
               <div className="bg-card/60 backdrop-blur-sm rounded-xl p-4 border border-border/30">
                 <div className="w-3 h-3 rounded-full bg-blue-400 mx-auto mb-2" />
                 <span className="text-[10px] uppercase tracking-[0.15em] text-blue-400 block">
-                  Cool-down
+                  Retour au calme
                 </span>
-                <span className="text-xs text-muted-foreground">~8 min</span>
+                <span className="text-xs text-muted-foreground">~10 min</span>
               </div>
             </div>
 
