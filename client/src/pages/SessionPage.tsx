@@ -1,8 +1,7 @@
 /*
  * Design: "Néon Fitness Flow" — Page de séance interactive
- * Layout cockpit: Timer en haut, exercice actif au centre, liste en sidebar
+ * Supporte 3 séances différentes via le paramètre URL /session/:id
  * Mode mains libres avec défilement automatique + signal sonore
- * Séance complète 1h Pilates au Sol & Mobilité
  */
 
 import { useTimer } from "@/hooks/useTimer";
@@ -24,14 +23,42 @@ import {
   Heart,
   Volume2,
 } from "lucide-react";
-import { useLocation } from "wouter";
-import { exercises, PHASE_LABELS, TOTAL_DURATION, getTotalMainExercises } from "@/lib/exerciseData";
+import { useLocation, useParams } from "wouter";
+import { getSessionById } from "@/lib/sessions";
+import { getTotalMainExercises } from "@/lib/sessionTypes";
+import { useMemo } from "react";
 
 const HERO_IMG =
   "https://d2xsxph8kpxj0f.cloudfront.net/310519663442254125/EDJjErcDe3f7pkvHdYd45d/hero-pilates-dark-eDrXjLic23sPpALmrZe8nq.webp";
 
+// Session accent colors
+const SESSION_COLORS: Record<string, { gradient: string; text: string; glow: string }> = {
+  classique: {
+    gradient: "from-emerald-500 to-green-500",
+    text: "text-emerald-400",
+    glow: "glow-green",
+  },
+  contemporain: {
+    gradient: "from-orange-500 to-amber-500",
+    text: "text-orange-400",
+    glow: "glow-coral",
+  },
+  mobilite: {
+    gradient: "from-cyan-500 to-blue-500",
+    text: "text-cyan-400",
+    glow: "glow-blue",
+  },
+};
+
 export default function SessionPage() {
   const [, setLocation] = useLocation();
+  const params = useParams<{ id: string }>();
+  const sessionId = params.id || "classique";
+  const session = getSessionById(sessionId);
+
+  // Memoize exercises to avoid re-creating on each render
+  const exerciseList = useMemo(() => session?.exercises ?? [], [session]);
+
   const {
     currentExercise,
     currentIndex,
@@ -45,7 +72,20 @@ export default function SessionPage() {
     skipToNext,
     skipToPrev,
     reset,
-  } = useTimer();
+  } = useTimer(exerciseList);
+
+  const colors = SESSION_COLORS[sessionId] || SESSION_COLORS.classique;
+
+  if (!session) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="font-display text-3xl text-foreground mb-4">Séance introuvable</h1>
+          <Button onClick={() => setLocation("/")}>Retour à l'accueil</Button>
+        </div>
+      </div>
+    );
+  }
 
   const formatTime = (secs: number) => {
     const m = Math.floor(secs / 60);
@@ -53,8 +93,8 @@ export default function SessionPage() {
     return `${m}:${s.toString().padStart(2, "0")}`;
   };
 
-  const totalMainExercises = getTotalMainExercises();
-  const totalMinutes = Math.round(TOTAL_DURATION / 60);
+  const totalMainExercises = getTotalMainExercises(exerciseList);
+  const totalMinutes = Math.round(session.totalDuration / 60);
 
   // Finished screen
   if (sessionState === "finished") {
@@ -66,20 +106,20 @@ export default function SessionPage() {
           transition={{ duration: 0.6, ease: "easeOut" }}
           className="text-center max-w-md"
         >
-          <div className="w-24 h-24 rounded-full bg-gradient-to-br from-green-400 to-emerald-500 flex items-center justify-center mx-auto mb-8 glow-green">
+          <div className={`w-24 h-24 rounded-full bg-gradient-to-br ${colors.gradient} flex items-center justify-center mx-auto mb-8`}>
             <Trophy className="w-12 h-12 text-background" />
           </div>
           <h1 className="font-display text-4xl font-bold text-foreground mb-4">
             Bravo !
           </h1>
           <p className="text-muted-foreground text-lg mb-2">
-            Séance Pilates au Sol & Mobilité terminée
+            {session.title} terminée
           </p>
           <p className="text-muted-foreground text-sm mb-8">
             Durée totale : {formatTime(totalElapsed)}
           </p>
           <p className="text-foreground/70 italic text-base mb-10 px-4">
-            "Bravo à tous pour cette magnifique séance de Pilates au sol d'une heure ! Vous avez travaillé la mobilité, la force profonde, l'équilibre et la souplesse. Pensez à bien vous hydrater. À très bientôt avec Coach Mimi !"
+            "{session.finishMessage}"
           </p>
           <div className="flex gap-4 justify-center">
             <Button
@@ -94,7 +134,7 @@ export default function SessionPage() {
             <Button
               size="lg"
               onClick={reset}
-              className="font-display bg-gradient-to-r from-green-500 to-emerald-500 text-background hover:from-green-600 hover:to-emerald-600"
+              className={`font-display bg-gradient-to-r ${colors.gradient} text-background hover:opacity-90`}
             >
               <RotateCcw className="w-4 h-4 mr-2" />
               Recommencer
@@ -109,7 +149,6 @@ export default function SessionPage() {
   if (sessionState === "idle") {
     return (
       <div className="min-h-screen bg-background relative overflow-hidden">
-        {/* Background image */}
         <div
           className="absolute inset-0 bg-cover bg-center opacity-20"
           style={{ backgroundImage: `url(${HERO_IMG})` }}
@@ -124,18 +163,21 @@ export default function SessionPage() {
             className="text-center max-w-lg"
           >
             <div className="flex items-center justify-center gap-2 mb-6">
-              <Heart className="w-5 h-5 text-red-400" />
-              <span className="font-display text-xs uppercase tracking-[0.25em] text-red-400">
-                Pilates au Sol & Mobilité
+              <Heart className={`w-5 h-5 ${colors.text}`} />
+              <span className={`font-display text-xs uppercase tracking-[0.25em] ${colors.text}`}>
+                {session.subtitle}
               </span>
             </div>
             <h1 className="font-display text-4xl md:text-5xl font-bold text-foreground mb-4 leading-tight">
-              Séance Débutant
+              {session.title}
               <br />
-              <span className="text-red-400">1 Heure au Tapis</span>
+              <span className={colors.text}>{session.duration}</span>
             </h1>
-            <p className="text-muted-foreground text-base mb-8 leading-relaxed">
-              {totalMainExercises} exercices &middot; ~{totalMinutes} min &middot; Tapis uniquement
+            <p className="text-muted-foreground text-base mb-2">
+              Niveau : {session.level}
+            </p>
+            <p className="text-muted-foreground text-sm mb-8 leading-relaxed max-w-md mx-auto">
+              {session.description}
             </p>
 
             {/* Quick info */}
@@ -143,27 +185,31 @@ export default function SessionPage() {
               <div className="bg-card/60 backdrop-blur-sm rounded-xl p-4 border border-border/30">
                 <div className="w-3 h-3 rounded-full bg-green-400 mx-auto mb-2" />
                 <span className="text-[10px] uppercase tracking-[0.15em] text-green-400 block">
-                  Echauffement
+                  {session.phaseLabels.warmup}
                 </span>
-                <span className="text-xs text-muted-foreground">~10 min</span>
               </div>
               <div className="bg-card/60 backdrop-blur-sm rounded-xl p-4 border border-border/30">
                 <div className="w-3 h-3 rounded-full bg-red-400 mx-auto mb-2" />
                 <span className="text-[10px] uppercase tracking-[0.15em] text-red-400 block">
-                  Pilates au Sol
+                  {session.phaseLabels.workout}
                 </span>
-                <span className="text-xs text-muted-foreground">~42 min</span>
               </div>
               <div className="bg-card/60 backdrop-blur-sm rounded-xl p-4 border border-border/30">
                 <div className="w-3 h-3 rounded-full bg-blue-400 mx-auto mb-2" />
                 <span className="text-[10px] uppercase tracking-[0.15em] text-blue-400 block">
-                  Retour au calme
+                  {session.phaseLabels.cooldown}
                 </span>
-                <span className="text-xs text-muted-foreground">~10 min</span>
               </div>
             </div>
 
-            {/* Sound notice */}
+            <div className="flex items-center justify-center gap-4 mb-6 text-muted-foreground text-xs">
+              <span>{totalMainExercises} exercices</span>
+              <span>&middot;</span>
+              <span>~{totalMinutes} min</span>
+              <span>&middot;</span>
+              <span>{session.equipment}</span>
+            </div>
+
             <div className="flex items-center justify-center gap-2 mb-6 text-muted-foreground">
               <Volume2 className="w-4 h-4" />
               <span className="text-xs">Signal sonore activé à chaque changement d'exercice</span>
@@ -172,7 +218,7 @@ export default function SessionPage() {
             <Button
               size="lg"
               onClick={startSession}
-              className="font-display text-lg px-10 py-6 bg-gradient-to-r from-red-500 to-orange-500 text-white hover:from-red-600 hover:to-orange-600 glow-coral rounded-2xl"
+              className={`font-display text-lg px-10 py-6 bg-gradient-to-r ${colors.gradient} text-white hover:opacity-90 rounded-2xl`}
             >
               <Play className="w-5 h-5 mr-3" />
               Démarrer la séance
@@ -203,7 +249,7 @@ export default function SessionPage() {
           transition={{ duration: 0.5, ease: "easeOut" }}
           className="text-center"
         >
-          <span className="font-display text-[120px] font-bold text-red-400 leading-none">
+          <span className={`font-display text-[120px] font-bold ${colors.text} leading-none`}>
             {countdownValue}
           </span>
           <p className="text-muted-foreground text-lg mt-4 font-display tracking-wider">
@@ -234,15 +280,21 @@ export default function SessionPage() {
             <div className="flex items-center gap-2">
               <Timer className="w-3.5 h-3.5 text-muted-foreground" />
               <span className="font-display text-sm text-muted-foreground tracking-wider">
-                {formatTime(totalElapsed)} / {formatTime(TOTAL_DURATION)}
+                {formatTime(totalElapsed)} / {formatTime(session.totalDuration)}
               </span>
             </div>
             <span className="font-display text-xs uppercase tracking-[0.15em] text-muted-foreground">
-              {PHASE_LABELS[currentExercise.phase]}
+              {session.phaseLabels[currentExercise?.phase ?? "warmup"]}
             </span>
           </div>
           <div className="mt-3">
-            <ProgressBar currentIndex={currentIndex} timeLeft={timeLeft} />
+            <ProgressBar
+              currentIndex={currentIndex}
+              timeLeft={timeLeft}
+              exerciseList={exerciseList}
+              totalDuration={session.totalDuration}
+              phaseLabels={session.phaseLabels}
+            />
           </div>
         </div>
       </header>
@@ -252,12 +304,11 @@ export default function SessionPage() {
         <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
           {/* Left: Timer + Exercise Card */}
           <div className="flex-1 flex flex-col items-center gap-6">
-            {/* Timer */}
             <CircularTimer
               timeLeft={timeLeft}
-              totalDuration={currentExercise.duration}
-              phase={currentExercise.phase}
-              isTransition={currentExercise.isTransition}
+              totalDuration={currentExercise?.duration ?? 45}
+              phase={currentExercise?.phase ?? "warmup"}
+              isTransition={currentExercise?.isTransition ?? false}
             />
 
             {/* Controls */}
@@ -276,7 +327,7 @@ export default function SessionPage() {
                 <Button
                   size="icon"
                   onClick={resume}
-                  className="rounded-full w-14 h-14 bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600 glow-coral"
+                  className={`rounded-full w-14 h-14 bg-gradient-to-r ${colors.gradient} hover:opacity-90`}
                 >
                   <Play className="w-6 h-6 text-white" />
                 </Button>
@@ -294,7 +345,7 @@ export default function SessionPage() {
                 variant="outline"
                 size="icon"
                 onClick={skipToNext}
-                disabled={currentIndex >= exercises.length - 1}
+                disabled={currentIndex >= exerciseList.length - 1}
                 className="rounded-full w-10 h-10 border-border/50"
               >
                 <SkipForward className="w-4 h-4" />
@@ -303,11 +354,11 @@ export default function SessionPage() {
 
             {/* Exercise Card */}
             <div className="w-full max-w-xl">
-              <ExerciseCard exercise={currentExercise} isActive={true} />
+              <ExerciseCard exercise={currentExercise} isActive={true} exerciseList={exerciseList} />
             </div>
 
             {/* Next up preview */}
-            {currentIndex < exercises.length - 1 && (
+            {currentIndex < exerciseList.length - 1 && (
               <div className="w-full max-w-xl">
                 <div className="flex items-center gap-2 mb-2">
                   <SkipForward className="w-3 h-3 text-muted-foreground" />
@@ -317,11 +368,11 @@ export default function SessionPage() {
                 </div>
                 <div className="bg-card/30 rounded-lg border border-border/20 px-4 py-3">
                   <span className="text-sm text-foreground/50 font-display">
-                    {exercises[currentIndex + 1].isTransition
-                      ? currentIndex + 2 < exercises.length
-                        ? exercises[currentIndex + 2].name
+                    {exerciseList[currentIndex + 1].isTransition
+                      ? currentIndex + 2 < exerciseList.length
+                        ? exerciseList[currentIndex + 2].name
                         : "Fin de séance"
-                      : exercises[currentIndex + 1].name}
+                      : exerciseList[currentIndex + 1].name}
                   </span>
                 </div>
               </div>
@@ -334,7 +385,7 @@ export default function SessionPage() {
               <h3 className="font-display text-xs uppercase tracking-[0.2em] text-muted-foreground mb-4">
                 Programme ({totalMainExercises} exercices)
               </h3>
-              <ExerciseList currentIndex={currentIndex} />
+              <ExerciseList currentIndex={currentIndex} exerciseList={exerciseList} />
             </div>
           </aside>
         </div>
@@ -377,7 +428,7 @@ export default function SessionPage() {
                 <Button
                   size="lg"
                   onClick={resume}
-                  className="font-display bg-gradient-to-r from-red-500 to-orange-500 text-white hover:from-red-600 hover:to-orange-600"
+                  className={`font-display bg-gradient-to-r ${colors.gradient} text-white hover:opacity-90`}
                 >
                   <Play className="w-4 h-4 mr-2" />
                   Reprendre

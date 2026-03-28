@@ -4,14 +4,15 @@
  */
 
 import { motion, AnimatePresence } from "framer-motion";
-import type { Exercise, Phase } from "@/lib/exerciseData";
-import { getExerciseNumber, getTotalMainExercises } from "@/lib/exerciseData";
+import type { Exercise, Phase } from "@/lib/sessionTypes";
+import { getExerciseNumber, getTotalMainExercises } from "@/lib/sessionTypes";
 import { MapPin, Dumbbell, MessageCircle, Target } from "lucide-react";
 import { useState } from "react";
 
 interface ExerciseCardProps {
   exercise: Exercise;
   isActive: boolean;
+  exerciseList: Exercise[];
 }
 
 const PHASE_BORDER: Record<Phase, string> = {
@@ -32,7 +33,7 @@ const PHASE_BADGE_BG: Record<Phase, string> = {
   cooldown: "bg-blue-500/15 text-blue-400",
 };
 
-export default function ExerciseCard({ exercise, isActive }: ExerciseCardProps) {
+export default function ExerciseCard({ exercise, isActive, exerciseList }: ExerciseCardProps) {
   const [imgError, setImgError] = useState(false);
 
   if (exercise.isTransition) {
@@ -68,8 +69,8 @@ export default function ExerciseCard({ exercise, isActive }: ExerciseCardProps) 
     );
   }
 
-  const exerciseNum = getExerciseNumber(exercise);
-  const totalExercises = getTotalMainExercises();
+  const exerciseNum = getExerciseNumber(exerciseList, exercise);
+  const totalExercises = getTotalMainExercises(exerciseList);
   const hasImage = exercise.imageUrl && !imgError;
 
   return (
@@ -95,7 +96,6 @@ export default function ExerciseCard({ exercise, isActive }: ExerciseCardProps) 
                 onError={() => setImgError(true)}
               />
               <div className="absolute inset-0 bg-gradient-to-t from-card via-transparent to-transparent" />
-              {/* Muscles badge overlay */}
               {exercise.targetMuscles && (
                 <div className="absolute bottom-3 right-3 flex items-center gap-1.5 bg-black/60 backdrop-blur-sm rounded-full px-3 py-1.5">
                   <Target className="w-3 h-3 text-red-400" />
@@ -134,7 +134,6 @@ export default function ExerciseCard({ exercise, isActive }: ExerciseCardProps) 
 
           {/* Details */}
           <div className="px-6 pb-5 space-y-4">
-            {/* Position */}
             {exercise.position && (
               <div className="flex items-start gap-3">
                 <MapPin className="w-4 h-4 text-muted-foreground mt-1 shrink-0" />
@@ -149,7 +148,6 @@ export default function ExerciseCard({ exercise, isActive }: ExerciseCardProps) 
               </div>
             )}
 
-            {/* Movement */}
             <div className="flex items-start gap-3">
               <Dumbbell className="w-4 h-4 text-muted-foreground mt-1 shrink-0" />
               <div>
@@ -162,7 +160,6 @@ export default function ExerciseCard({ exercise, isActive }: ExerciseCardProps) 
               </div>
             </div>
 
-            {/* Coaching */}
             <div
               className={`rounded-lg p-4 ${
                 exercise.phase === "warmup"

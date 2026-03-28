@@ -1,6 +1,6 @@
 /*
- * Design: "Néon Fitness Flow" — Page d'accueil immersive
- * Hero sombre avec vidéo de fond, photo réelle de Coach Mimi, séance 1h
+ * Design: "Néon Fitness Flow" — Page d'accueil avec catalogue de 3 séances
+ * Hero sombre avec vidéo, photo Coach Mimi, sélecteur de séances
  */
 
 import { Button } from "@/components/ui/button";
@@ -15,9 +15,13 @@ import {
   Shield,
   Volume2,
   Image as ImageIcon,
+  Sparkles,
+  Wind,
+  Activity,
 } from "lucide-react";
 import { useLocation } from "wouter";
 import { useRef, useState } from "react";
+import { allSessions } from "@/lib/sessions";
 
 const HERO_VIDEO =
   "https://d2xsxph8kpxj0f.cloudfront.net/310519663442254125/EDJjErcDe3f7pkvHdYd45d/jardindeden_2103c822.mp4";
@@ -32,6 +36,49 @@ const COOLDOWN_IMG =
 const COACH_PHOTO =
   "https://d2xsxph8kpxj0f.cloudfront.net/310519663442254125/EDJjErcDe3f7pkvHdYd45d/coach-mimi-photo_6625e8f3.jpeg";
 
+// Session card styling
+const SESSION_CARD_STYLES: Record<string, {
+  gradient: string;
+  border: string;
+  icon: typeof Flame;
+  iconColor: string;
+  badgeColor: string;
+  ctaGradient: string;
+  glowClass: string;
+  image: string;
+}> = {
+  classique: {
+    gradient: "from-emerald-500/10 via-transparent to-transparent",
+    border: "border-emerald-500/30 hover:border-emerald-400/60",
+    icon: Heart,
+    iconColor: "text-emerald-400",
+    badgeColor: "bg-emerald-500/15 text-emerald-400",
+    ctaGradient: "from-emerald-500 to-green-500",
+    glowClass: "glow-green",
+    image: WARMUP_IMG,
+  },
+  contemporain: {
+    gradient: "from-orange-500/10 via-transparent to-transparent",
+    border: "border-orange-500/30 hover:border-orange-400/60",
+    icon: Flame,
+    iconColor: "text-orange-400",
+    badgeColor: "bg-orange-500/15 text-orange-400",
+    ctaGradient: "from-orange-500 to-amber-500",
+    glowClass: "glow-coral",
+    image: WORKOUT_IMG,
+  },
+  mobilite: {
+    gradient: "from-cyan-500/10 via-transparent to-transparent",
+    border: "border-cyan-500/30 hover:border-cyan-400/60",
+    icon: Wind,
+    iconColor: "text-cyan-400",
+    badgeColor: "bg-cyan-500/15 text-cyan-400",
+    ctaGradient: "from-cyan-500 to-blue-500",
+    glowClass: "glow-blue",
+    image: COOLDOWN_IMG,
+  },
+};
+
 export default function Home() {
   const [, setLocation] = useLocation();
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -40,8 +87,7 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-background text-foreground">
       {/* HERO SECTION with Video Background */}
-      <section className="relative min-h-screen flex items-center overflow-hidden">
-        {/* Video Background */}
+      <section className="relative min-h-[85vh] flex items-center overflow-hidden">
         <video
           ref={videoRef}
           autoPlay
@@ -54,7 +100,6 @@ export default function Home() {
         >
           <source src={HERO_VIDEO} type="video/mp4" />
         </video>
-        {/* Fallback image */}
         {!videoLoaded && (
           <div
             className="absolute inset-0 bg-cover bg-center opacity-20"
@@ -64,7 +109,6 @@ export default function Home() {
         <div className="absolute inset-0 bg-gradient-to-r from-background via-background/85 to-background/40" />
         <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-background/30" />
 
-        {/* Content */}
         <div className="relative z-10 container">
           <div className="max-w-2xl py-20 md:py-0">
             <motion.div
@@ -72,81 +116,65 @@ export default function Home() {
               animate={{ y: 0, opacity: 1 }}
               transition={{ duration: 0.7, delay: 0.1 }}
             >
-              {/* Badge */}
               <div className="flex items-center gap-2 mb-6">
                 <div className="w-8 h-8 rounded-full bg-red-500/20 flex items-center justify-center">
                   <Flame className="w-4 h-4 text-red-400" />
                 </div>
                 <span className="font-display text-xs uppercase tracking-[0.25em] text-red-400 font-medium">
-                  Pilates au Sol &middot; Mobilité &middot; Débutant
+                  Pilates &middot; Mobilité &middot; Coach Mimi
                 </span>
               </div>
 
-              {/* Title */}
               <h1 className="font-display text-5xl md:text-7xl font-bold leading-[0.95] mb-6">
-                <span className="text-foreground">1 Heure de</span>
+                <span className="text-foreground">3 Séances</span>
                 <br />
-                <span className="text-foreground">Pilates au Sol</span>
+                <span className="text-foreground">Pilates &amp; Mobilité</span>
                 <br />
                 <span className="bg-gradient-to-r from-red-400 via-orange-400 to-amber-400 bg-clip-text text-transparent">
-                  &amp; Mobilité
+                  Guidées au Sol
                 </span>
               </h1>
 
-              {/* Description */}
               <p className="text-lg text-foreground/60 leading-relaxed mb-8 max-w-lg">
-                Séance complète de Pilates au sol et mobilité guidée par Coach Mimi.
-                60 exercices au tapis, sans matériel, avec timer, illustrations,
-                signal sonore et instructions de coaching en temps réel.
+                Choisissez votre séance parmi 3 programmes complets : Pilates Classique,
+                Pilates Contemporain ou Mobilité Pure. Timer, illustrations, signal sonore
+                et coaching en temps réel.
               </p>
 
-              {/* Stats */}
               <div className="flex flex-wrap gap-6 mb-10">
                 <div className="flex items-center gap-2">
                   <Clock className="w-4 h-4 text-muted-foreground" />
-                  <span className="text-sm text-foreground/70">60 min</span>
+                  <span className="text-sm text-foreground/70">3 séances</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Heart className="w-4 h-4 text-muted-foreground" />
-                  <span className="text-sm text-foreground/70">
-                    Tapis uniquement
-                  </span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Zap className="w-4 h-4 text-muted-foreground" />
-                  <span className="text-sm text-foreground/70">
-                    45s effort / 15s repos
-                  </span>
+                  <span className="text-sm text-foreground/70">Tapis uniquement</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Volume2 className="w-4 h-4 text-muted-foreground" />
-                  <span className="text-sm text-foreground/70">
-                    Signal sonore
-                  </span>
+                  <span className="text-sm text-foreground/70">Signal sonore</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <ImageIcon className="w-4 h-4 text-muted-foreground" />
-                  <span className="text-sm text-foreground/70">
-                    Photos mouvements
-                  </span>
+                  <span className="text-sm text-foreground/70">Illustrations</span>
                 </div>
               </div>
 
-              {/* CTA */}
               <Button
                 size="lg"
-                onClick={() => setLocation("/session")}
+                onClick={() => {
+                  document.getElementById("seances")?.scrollIntoView({ behavior: "smooth" });
+                }}
                 className="font-display text-lg px-10 py-7 bg-gradient-to-r from-red-500 to-orange-500 text-white hover:from-red-600 hover:to-orange-600 glow-coral rounded-2xl group"
               >
-                <Play className="w-5 h-5 mr-3 group-hover:scale-110 transition-transform" />
-                Commencer la séance
+                <Sparkles className="w-5 h-5 mr-3 group-hover:scale-110 transition-transform" />
+                Choisir ma séance
                 <ChevronRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
               </Button>
             </motion.div>
           </div>
         </div>
 
-        {/* Scroll indicator */}
         <motion.div
           className="absolute bottom-8 left-1/2 -translate-x-1/2"
           animate={{ y: [0, 8, 0] }}
@@ -158,8 +186,8 @@ export default function Home() {
         </motion.div>
       </section>
 
-      {/* PHASES SECTION */}
-      <section className="py-24 relative">
+      {/* SESSIONS CATALOGUE */}
+      <section id="seances" className="py-24 relative">
         <div className="container">
           <motion.div
             initial={{ y: 20, opacity: 0 }}
@@ -169,134 +197,107 @@ export default function Home() {
             className="text-center mb-16"
           >
             <span className="font-display text-xs uppercase tracking-[0.25em] text-muted-foreground block mb-3">
-              Structure de la séance
+              Catalogue de séances
             </span>
-            <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground">
-              3 phases, 60 exercices au sol, 1 heure
+            <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-4">
+              Choisissez votre programme
             </h2>
+            <p className="text-muted-foreground max-w-xl mx-auto">
+              3 séances complètes au sol, sans matériel, guidées pas à pas avec timer,
+              illustrations et signal sonore.
+            </p>
           </motion.div>
 
-          <div className="grid md:grid-cols-3 gap-6">
-            {/* Warmup */}
-            <motion.div
-              initial={{ y: 30, opacity: 0 }}
-              whileInView={{ y: 0, opacity: 1 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0 }}
-              className="group relative rounded-2xl overflow-hidden border border-border/30 bg-card"
-            >
-              <div className="aspect-[4/3] overflow-hidden">
-                <img
-                  src={WARMUP_IMG}
-                  alt="Echauffement"
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-card via-card/40 to-transparent" />
-              </div>
-              <div className="relative p-6 -mt-16 z-10">
-                <div className="flex items-center gap-2 mb-3">
-                  <div className="w-3 h-3 rounded-full bg-green-400" />
-                  <span className="font-display text-xs uppercase tracking-[0.15em] text-green-400">
-                    Phase 1
-                  </span>
-                </div>
-                <h3 className="font-display text-xl font-bold text-foreground mb-2">
-                  Echauffement & Mobilité
-                </h3>
-                <p className="text-sm text-muted-foreground leading-relaxed mb-3">
-                  Respiration Pilates, bascule du bassin, pont articulé,
-                  Cat-Cow, Thread the Needle, cercles de hanches et rotations
-                  pour mobiliser toute la colonne.
-                </p>
-                <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                  <span>10 exercices</span>
-                  <span>&middot;</span>
-                  <span>10 min</span>
-                  <span>&middot;</span>
-                  <span>Mobilité</span>
-                </div>
-              </div>
-            </motion.div>
+          <div className="grid md:grid-cols-3 gap-8">
+            {allSessions.map((session, idx) => {
+              const style = SESSION_CARD_STYLES[session.id] || SESSION_CARD_STYLES.classique;
+              const Icon = style.icon;
+              const totalMin = Math.round(session.totalDuration / 60);
+              const mainExCount = session.exercises.filter(e => !e.isTransition).length;
 
-            {/* Workout */}
-            <motion.div
-              initial={{ y: 30, opacity: 0 }}
-              whileInView={{ y: 0, opacity: 1 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0.15 }}
-              className="group relative rounded-2xl overflow-hidden border border-border/30 bg-card"
-            >
-              <div className="aspect-[4/3] overflow-hidden">
-                <img
-                  src={WORKOUT_IMG}
-                  alt="Workout"
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-card via-card/40 to-transparent" />
-              </div>
-              <div className="relative p-6 -mt-16 z-10">
-                <div className="flex items-center gap-2 mb-3">
-                  <div className="w-3 h-3 rounded-full bg-red-400" />
-                  <span className="font-display text-xs uppercase tracking-[0.15em] text-red-400">
-                    Phase 2
-                  </span>
-                </div>
-                <h3 className="font-display text-xl font-bold text-foreground mb-2">
-                  Pilates au Sol
-                </h3>
-                <p className="text-sm text-muted-foreground leading-relaxed mb-3">
-                             The Hundred, Roll-Up, Criss-Cross, Swimming, Teaser,
-                  planches, ponts, Bird Dog et série fessiers au sol.
-                </p>
-                <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                  <span>40 exercices</span>
-                  <span>&middot;</span>
-                  <span>42 min</span>
-                  <span>&middot;</span>
-                  <span>Au tapis</span>
-                </div>
-              </div>
-            </motion.div>
+              return (
+                <motion.div
+                  key={session.id}
+                  initial={{ y: 40, opacity: 0 }}
+                  whileInView={{ y: 0, opacity: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5, delay: idx * 0.15 }}
+                  className={`group relative rounded-2xl overflow-hidden border bg-card transition-all duration-500 ${style.border}`}
+                >
+                  {/* Card image */}
+                  <div className="aspect-[16/10] overflow-hidden relative">
+                    <img
+                      src={style.image}
+                      alt={session.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-card via-card/60 to-transparent" />
+                    {/* Level badge */}
+                    <div className={`absolute top-4 left-4 px-3 py-1.5 rounded-full text-[10px] font-display uppercase tracking-[0.15em] font-bold ${style.badgeColor}`}>
+                      {session.level}
+                    </div>
+                    {/* Duration badge */}
+                    <div className="absolute top-4 right-4 px-3 py-1.5 rounded-full bg-black/50 backdrop-blur-sm text-[10px] font-display text-white/80 flex items-center gap-1.5">
+                      <Clock className="w-3 h-3" />
+                      ~{totalMin} min
+                    </div>
+                  </div>
 
-            {/* Cooldown */}
-            <motion.div
-              initial={{ y: 30, opacity: 0 }}
-              whileInView={{ y: 0, opacity: 1 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0.3 }}
-              className="group relative rounded-2xl overflow-hidden border border-border/30 bg-card"
-            >
-              <div className="aspect-[4/3] overflow-hidden">
-                <img
-                  src={COOLDOWN_IMG}
-                  alt="Cool-down"
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-card via-card/40 to-transparent" />
-              </div>
-              <div className="relative p-6 -mt-16 z-10">
-                <div className="flex items-center gap-2 mb-3">
-                  <div className="w-3 h-3 rounded-full bg-blue-400" />
-                  <span className="font-display text-xs uppercase tracking-[0.15em] text-blue-400">
-                    Phase 3
-                  </span>
-                </div>
-                <h3 className="font-display text-xl font-bold text-foreground mb-2">
-                  Retour au calme
-                </h3>
-                <p className="text-sm text-muted-foreground leading-relaxed mb-3">
-                  Étirements profonds, torsions, posture de l'enfant et
-                  relaxation finale en Savasana.
-                </p>
-                <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                  <span>10 exercices</span>
-                  <span>&middot;</span>
-                  <span>10 min</span>
-                  <span>&middot;</span>
-                  <span>Étirements</span>
-                </div>
-              </div>
-            </motion.div>
+                  {/* Card content */}
+                  <div className={`p-6 bg-gradient-to-b ${style.gradient}`}>
+                    <div className="flex items-center gap-3 mb-3">
+                      <div className={`w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center ${style.iconColor}`}>
+                        <Icon className="w-5 h-5" />
+                      </div>
+                      <div>
+                        <h3 className="font-display text-xl font-bold text-foreground leading-tight">
+                          {session.title}
+                        </h3>
+                        <span className="text-xs text-muted-foreground">{session.subtitle}</span>
+                      </div>
+                    </div>
+
+                    <p className="text-sm text-muted-foreground leading-relaxed mb-5 line-clamp-3">
+                      {session.description}
+                    </p>
+
+                    {/* Stats row */}
+                    <div className="flex items-center gap-3 mb-6 text-xs text-muted-foreground">
+                      <div className="flex items-center gap-1">
+                        <Activity className="w-3 h-3" />
+                        <span>{mainExCount} exercices</span>
+                      </div>
+                      <span className="text-border">&middot;</span>
+                      <span>{session.equipment}</span>
+                    </div>
+
+                    {/* Phase pills */}
+                    <div className="flex flex-wrap gap-2 mb-6">
+                      <span className="text-[10px] px-2.5 py-1 rounded-full bg-green-500/10 text-green-400 font-display uppercase tracking-wider">
+                        {session.phaseLabels.warmup}
+                      </span>
+                      <span className="text-[10px] px-2.5 py-1 rounded-full bg-red-500/10 text-red-400 font-display uppercase tracking-wider">
+                        {session.phaseLabels.workout}
+                      </span>
+                      <span className="text-[10px] px-2.5 py-1 rounded-full bg-blue-500/10 text-blue-400 font-display uppercase tracking-wider">
+                        {session.phaseLabels.cooldown}
+                      </span>
+                    </div>
+
+                    {/* CTA */}
+                    <Button
+                      size="lg"
+                      onClick={() => setLocation(`/session/${session.id}`)}
+                      className={`w-full font-display bg-gradient-to-r ${style.ctaGradient} text-white hover:opacity-90 rounded-xl group/btn`}
+                    >
+                      <Play className="w-4 h-4 mr-2 group-hover/btn:scale-110 transition-transform" />
+                      Lancer la séance
+                      <ChevronRight className="w-4 h-4 ml-auto group-hover/btn:translate-x-1 transition-transform" />
+                    </Button>
+                  </div>
+                </motion.div>
+              );
+            })}
           </div>
         </div>
       </section>
@@ -326,11 +327,11 @@ export default function Home() {
                   </div>
                   <div>
                     <h3 className="font-display font-semibold text-foreground mb-1">
-                      Timer automatique 1h
+                      Timer automatique
                     </h3>
                     <p className="text-sm text-muted-foreground leading-relaxed">
                       Compte à rebours visuel pour chaque exercice. 45 secondes
-                      d'effort, 15 secondes de transition. Séance complète d'une heure.
+                      d'effort, transitions guidées. 3 séances complètes disponibles.
                     </p>
                   </div>
                 </div>
@@ -368,11 +369,11 @@ export default function Home() {
                   </div>
                   <div>
                     <h3 className="font-display font-semibold text-foreground mb-1">
-                      Adapté débutants
+                      Tous niveaux
                     </h3>
                     <p className="text-sm text-muted-foreground leading-relaxed">
-                      Mouvements contrôlés, low impact, avec des options de
-                      modification pour chaque niveau.
+                      Du débutant à l'intermédiaire, chaque séance propose des mouvements
+                      adaptés avec des instructions de coaching détaillées.
                     </p>
                   </div>
                 </div>
@@ -420,19 +421,21 @@ export default function Home() {
             transition={{ duration: 0.6 }}
           >
             <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-4">
-              Prêt à transpirer ?
+              Prête à transpirer ?
             </h2>
             <p className="text-muted-foreground text-lg mb-8 max-w-md mx-auto">
-              1 heure de Pilates au sol et mobilité. Lancez la séance
+              3 séances de Pilates au sol et mobilité. Choisissez votre programme
               et laissez-vous guider exercice par exercice.
             </p>
             <Button
               size="lg"
-              onClick={() => setLocation("/session")}
+              onClick={() => {
+                document.getElementById("seances")?.scrollIntoView({ behavior: "smooth" });
+              }}
               className="font-display text-lg px-10 py-7 bg-gradient-to-r from-red-500 to-orange-500 text-white hover:from-red-600 hover:to-orange-600 glow-coral rounded-2xl group"
             >
               <Play className="w-5 h-5 mr-3 group-hover:scale-110 transition-transform" />
-              Démarrer maintenant
+              Voir les séances
             </Button>
           </motion.div>
         </div>
@@ -445,7 +448,7 @@ export default function Home() {
             Coach Mimi &middot; Pilates au Sol &amp; Mobilité &middot; Abidjan
           </p>
           <p className="text-[10px] text-muted-foreground/50 mt-1">
-            Séance Pilates au sol &middot; Niveau Débutant
+            3 séances complètes &middot; Pilates Classique &middot; Pilates Contemporain &middot; Mobilité Pure
           </p>
         </div>
       </footer>

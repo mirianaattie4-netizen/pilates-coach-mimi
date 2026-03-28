@@ -4,12 +4,13 @@
  */
 
 import { motion } from "framer-motion";
-import { exercises, type Phase } from "@/lib/exerciseData";
+import type { Exercise, Phase } from "@/lib/sessionTypes";
 import { Check } from "lucide-react";
 import { useEffect, useRef } from "react";
 
 interface ExerciseListProps {
   currentIndex: number;
+  exerciseList: Exercise[];
 }
 
 const PHASE_DOT: Record<Phase, string> = {
@@ -24,21 +25,19 @@ const PHASE_TEXT_ACTIVE: Record<Phase, string> = {
   cooldown: "text-blue-400",
 };
 
-export default function ExerciseList({ currentIndex }: ExerciseListProps) {
+export default function ExerciseList({ currentIndex, exerciseList }: ExerciseListProps) {
   const listRef = useRef<HTMLDivElement>(null);
   const activeRef = useRef<HTMLDivElement>(null);
 
-  // Only show main exercises (not transitions)
-  const mainExercises = exercises.filter((e) => !e.isTransition);
+  const mainExercises = exerciseList.filter((e) => !e.isTransition);
 
-  // Find which main exercise corresponds to current index
-  const currentExercise = exercises[currentIndex];
-  const currentMainId = currentExercise.isTransition
-    ? exercises
+  const currentExercise = exerciseList[currentIndex];
+  const currentMainId = currentExercise?.isTransition
+    ? exerciseList
         .slice(0, currentIndex)
         .filter((e) => !e.isTransition)
         .pop()?.id
-    : currentExercise.id;
+    : currentExercise?.id;
 
   useEffect(() => {
     if (activeRef.current && listRef.current) {
@@ -76,7 +75,6 @@ export default function ExerciseList({ currentIndex }: ExerciseListProps) {
                   : "hover:bg-white/3"
               }`}
             >
-              {/* Number / Check */}
               <div className="w-7 h-7 flex items-center justify-center shrink-0">
                 {isPast ? (
                   <Check className="w-4 h-4 text-muted-foreground" />
@@ -93,7 +91,6 @@ export default function ExerciseList({ currentIndex }: ExerciseListProps) {
                 )}
               </div>
 
-              {/* Name */}
               <span
                 className={`text-sm font-medium truncate ${
                   isActive
@@ -106,7 +103,6 @@ export default function ExerciseList({ currentIndex }: ExerciseListProps) {
                 {ex.name}
               </span>
 
-              {/* Duration */}
               <span className="ml-auto text-[10px] text-muted-foreground font-display tracking-wider shrink-0">
                 {ex.startTime}
               </span>

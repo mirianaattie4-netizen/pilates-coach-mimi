@@ -4,7 +4,7 @@
  */
 
 import { motion } from "framer-motion";
-import type { Phase } from "@/lib/exerciseData";
+import type { Phase } from "@/lib/sessionTypes";
 
 interface CircularTimerProps {
   timeLeft: number;

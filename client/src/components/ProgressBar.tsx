@@ -4,36 +4,39 @@
  */
 
 import { motion } from "framer-motion";
-import { exercises, TOTAL_DURATION } from "@/lib/exerciseData";
+import type { Exercise } from "@/lib/sessionTypes";
 
 interface ProgressBarProps {
   currentIndex: number;
   timeLeft: number;
+  exerciseList: Exercise[];
+  totalDuration: number;
+  phaseLabels: { warmup: string; workout: string; cooldown: string };
 }
 
-export default function ProgressBar({ currentIndex, timeLeft }: ProgressBarProps) {
-  // Calculate total elapsed time
+export default function ProgressBar({ currentIndex, timeLeft, exerciseList, totalDuration, phaseLabels }: ProgressBarProps) {
   let elapsed = 0;
   for (let i = 0; i < currentIndex; i++) {
-    elapsed += exercises[i].duration;
+    elapsed += exerciseList[i].duration;
   }
-  elapsed += exercises[currentIndex].duration - timeLeft;
+  if (exerciseList[currentIndex]) {
+    elapsed += exerciseList[currentIndex].duration - timeLeft;
+  }
 
-  const overallProgress = (elapsed / TOTAL_DURATION) * 100;
+  const overallProgress = (elapsed / totalDuration) * 100;
 
-  // Phase boundaries (percentage)
   const warmupEnd =
-    (exercises
+    (exerciseList
       .filter((e) => e.phase === "warmup")
       .reduce((s, e) => s + e.duration, 0) /
-      TOTAL_DURATION) *
+      totalDuration) *
     100;
   const workoutEnd =
     warmupEnd +
-    (exercises
+    (exerciseList
       .filter((e) => e.phase === "workout")
       .reduce((s, e) => s + e.duration, 0) /
-      TOTAL_DURATION) *
+      totalDuration) *
       100;
 
   const formatTime = (secs: number) => {
@@ -49,11 +52,10 @@ export default function ProgressBar({ currentIndex, timeLeft }: ProgressBarProps
           {formatTime(elapsed)}
         </span>
         <span className="text-xs font-display text-muted-foreground tracking-wider">
-          {formatTime(TOTAL_DURATION)}
+          {formatTime(totalDuration)}
         </span>
       </div>
       <div className="relative h-2 rounded-full overflow-hidden bg-white/5">
-        {/* Phase segments background */}
         <div
           className="absolute inset-y-0 left-0 bg-green-500/15"
           style={{ width: `${warmupEnd}%` }}
@@ -67,7 +69,6 @@ export default function ProgressBar({ currentIndex, timeLeft }: ProgressBarProps
           style={{ left: `${workoutEnd}%` }}
         />
 
-        {/* Active progress */}
         <motion.div
           className="absolute inset-y-0 left-0 rounded-full"
           style={{
@@ -82,7 +83,6 @@ export default function ProgressBar({ currentIndex, timeLeft }: ProgressBarProps
           transition={{ duration: 0.5, ease: "easeOut" }}
         />
 
-        {/* Phase dividers */}
         <div
           className="absolute inset-y-0 w-px bg-white/20"
           style={{ left: `${warmupEnd}%` }}
@@ -94,13 +94,13 @@ export default function ProgressBar({ currentIndex, timeLeft }: ProgressBarProps
       </div>
       <div className="flex justify-between mt-1.5">
         <span className="text-[9px] uppercase tracking-[0.15em] text-green-400/60">
-          Echauffement
+          {phaseLabels.warmup}
         </span>
         <span className="text-[9px] uppercase tracking-[0.15em] text-red-400/60">
-          Workout
+          {phaseLabels.workout}
         </span>
         <span className="text-[9px] uppercase tracking-[0.15em] text-blue-400/60">
-          Cool-down
+          {phaseLabels.cooldown}
         </span>
       </div>
     </div>

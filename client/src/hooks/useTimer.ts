@@ -1,21 +1,23 @@
 import { useState, useCallback, useRef, useEffect } from "react";
-import { exercises, type Exercise } from "@/lib/exerciseData";
+import type { Exercise } from "@/lib/sessionTypes";
 import { useSound } from "./useSound";
 
 export type SessionState = "idle" | "countdown" | "running" | "paused" | "finished";
 
-export function useTimer() {
+export function useTimer(exerciseList: Exercise[]) {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [timeLeft, setTimeLeft] = useState(exercises[0].duration);
+  const [timeLeft, setTimeLeft] = useState(exerciseList[0]?.duration ?? 45);
   const [sessionState, setSessionState] = useState<SessionState>("idle");
   const [countdownValue, setCountdownValue] = useState(5);
   const [totalElapsed, setTotalElapsed] = useState(0);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const prevIndexRef = useRef(0);
+  const exercisesRef = useRef(exerciseList);
+  exercisesRef.current = exerciseList;
 
   const { playTransition, playExerciseStart, playCountdownTick, playFinished, playWarning } = useSound();
 
-  const currentExercise: Exercise = exercises[currentIndex];
+  const currentExercise: Exercise = exerciseList[currentIndex];
 
   const clearTimer = useCallback(() => {
     if (intervalRef.current) {
@@ -50,25 +52,27 @@ export function useTimer() {
   }, []);
 
   const skipToNext = useCallback(() => {
-    if (currentIndex < exercises.length - 1) {
+    const exs = exercisesRef.current;
+    if (currentIndex < exs.length - 1) {
       const nextIdx = currentIndex + 1;
       setCurrentIndex(nextIdx);
-      setTimeLeft(exercises[nextIdx].duration);
+      setTimeLeft(exs[nextIdx].duration);
     }
   }, [currentIndex]);
 
   const skipToPrev = useCallback(() => {
+    const exs = exercisesRef.current;
     if (currentIndex > 0) {
       const prevIdx = currentIndex - 1;
       setCurrentIndex(prevIdx);
-      setTimeLeft(exercises[prevIdx].duration);
+      setTimeLeft(exs[prevIdx].duration);
     }
   }, [currentIndex]);
 
   const reset = useCallback(() => {
     clearTimer();
     setCurrentIndex(0);
-    setTimeLeft(exercises[0].duration);
+    setTimeLeft(exercisesRef.current[0]?.duration ?? 45);
     setSessionState("idle");
     setTotalElapsed(0);
     prevIndexRef.current = 0;
@@ -79,8 +83,8 @@ export function useTimer() {
     if (sessionState !== "running" && sessionState !== "paused") return;
     if (currentIndex === prevIndexRef.current) return;
     
-    const exercise = exercises[currentIndex];
-    if (exercise.isTransition) {
+    const exercise = exercisesRef.current[currentIndex];
+    if (exercise?.isTransition) {
       playTransition();
     } else {
       playExerciseStart();
@@ -109,15 +113,15 @@ export function useTimer() {
     const timer = setInterval(() => {
       setTimeLeft((prev) => {
         if (prev <= 1) {
-          // Move to next exercise
           setCurrentIndex((idx) => {
-            if (idx >= exercises.length - 1) {
+            const exs = exercisesRef.current;
+            if (idx >= exs.length - 1) {
               setSessionState("finished");
               playFinished();
               return idx;
             }
             const nextIdx = idx + 1;
-            setTimeLeft(exercises[nextIdx].duration);
+            setTimeLeft(exs[nextIdx].duration);
             return nextIdx;
           });
           return 0;

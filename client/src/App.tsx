@@ -11,7 +11,8 @@ function Router() {
   return (
     <Switch>
       <Route path={"/"} component={Home} />
-      <Route path={"/session"} component={SessionPage} />
+      <Route path="/session/:id" component={SessionPage} />
+      <Route path="/session" component={SessionPage} />
       <Route path={"/404"} component={NotFound} />
       <Route component={NotFound} />
     </Switch>
