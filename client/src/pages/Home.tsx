@@ -116,24 +116,74 @@ const SESSION_COLORS: Record<string, {
     badgeColor: "bg-fuchsia-500/15 text-fuchsia-400",
     ctaGradient: "from-fuchsia-500 to-purple-500",
   },
+  "hiit-fullbody": {
+    gradient: "from-rose-500/10 via-transparent to-transparent",
+    border: "border-rose-500/20 hover:border-rose-400/50",
+    icon: Zap,
+    iconColor: "text-rose-400",
+    badgeColor: "bg-rose-500/15 text-rose-400",
+    ctaGradient: "from-rose-500 to-red-500",
+  },
+  "hiit-bas-du-corps": {
+    gradient: "from-orange-600/10 via-transparent to-transparent",
+    border: "border-orange-600/20 hover:border-orange-500/50",
+    icon: Flame,
+    iconColor: "text-orange-500",
+    badgeColor: "bg-orange-600/15 text-orange-500",
+    ctaGradient: "from-orange-600 to-red-500",
+  },
+  "hiit-haut-du-corps": {
+    gradient: "from-sky-500/10 via-transparent to-transparent",
+    border: "border-sky-500/20 hover:border-sky-400/50",
+    icon: Dumbbell,
+    iconColor: "text-sky-400",
+    badgeColor: "bg-sky-500/15 text-sky-400",
+    ctaGradient: "from-sky-500 to-blue-500",
+  },
+  "hiit-core": {
+    gradient: "from-yellow-500/10 via-transparent to-transparent",
+    border: "border-yellow-500/20 hover:border-yellow-400/50",
+    icon: Target,
+    iconColor: "text-yellow-400",
+    badgeColor: "bg-yellow-500/15 text-yellow-400",
+    ctaGradient: "from-yellow-500 to-amber-500",
+  },
+  "hiit-cardio": {
+    gradient: "from-red-600/10 via-transparent to-transparent",
+    border: "border-red-600/20 hover:border-red-500/50",
+    icon: Flame,
+    iconColor: "text-red-500",
+    badgeColor: "bg-red-600/15 text-red-500",
+    ctaGradient: "from-red-600 to-rose-500",
+  },
+  "hiit-tabata": {
+    gradient: "from-purple-600/10 via-transparent to-transparent",
+    border: "border-purple-600/20 hover:border-purple-500/50",
+    icon: Zap,
+    iconColor: "text-purple-400",
+    badgeColor: "bg-purple-600/15 text-purple-400",
+    ctaGradient: "from-purple-600 to-violet-500",
+  },
 };
 
 const defaultColor = SESSION_COLORS.classique;
 
 /* ─── Category filter ─── */
-type Category = "all" | "pilates" | "mobilite" | "stretching";
+type Category = "all" | "pilates" | "mobilite" | "stretching" | "hiit";
 
 const CATEGORIES: { key: Category; label: string; color: string }[] = [
   { key: "all", label: "Toutes", color: "from-red-500/20 to-orange-500/20 text-orange-300" },
   { key: "pilates", label: "Pilates", color: "from-emerald-500/20 to-green-500/20 text-emerald-300" },
   { key: "mobilite", label: "Mobilité", color: "from-cyan-500/20 to-blue-500/20 text-cyan-300" },
   { key: "stretching", label: "Stretching", color: "from-fuchsia-500/20 to-purple-500/20 text-fuchsia-300" },
+  { key: "hiit", label: "HIIT Circuit", color: "from-red-600/20 to-rose-500/20 text-red-400" },
 ];
 
 function getSessionCategory(id: string): Category {
   if (["classique", "contemporain", "avance", "bas-du-corps", "haut-du-corps"].includes(id)) return "pilates";
   if (["mobilite", "mobilite-hanches", "mobilite-colonne"].includes(id)) return "mobilite";
   if (id === "stretching") return "stretching";
+  if (["hiit-fullbody", "hiit-bas-du-corps", "hiit-haut-du-corps", "hiit-core", "hiit-cardio", "hiit-tabata"].includes(id)) return "hiit";
   return "pilates";
 }
 
@@ -190,9 +240,9 @@ export default function Home() {
               </div>
 
               <h1 className="font-display text-5xl md:text-7xl font-bold leading-[0.95] mb-6">
-                <span className="text-foreground">9 Séances</span>
+                <span className="text-foreground">15 Séances</span>
                 <br />
-                <span className="text-foreground">Pilates &amp; Mobilité</span>
+                <span className="text-foreground">Pilates, HIIT &amp; Mobilité</span>
                 <br />
                 <span className="bg-gradient-to-r from-red-400 via-orange-400 to-amber-400 bg-clip-text text-transparent">
                   Guidées au Sol
@@ -200,15 +250,15 @@ export default function Home() {
               </h1>
 
               <p className="text-lg text-foreground/60 leading-relaxed mb-8 max-w-lg">
-                Pilates Classique, Avancé, Bas du Corps, Haut du Corps, Contemporain, 
-                Mobilité Hanches, Colonne, et Stretching Profond. Timer, illustrations, 
-                signal sonore, lecteur vocal et coaching en temps réel.
+                15 séances complètes : Pilates Classique, Avancé, Contemporain, Bas &amp; Haut du Corps, 
+                6 circuits HIIT (Full Body, Bas du Corps, Haut du Corps, Core, Cardio, Tabata), 
+                Mobilité, Stretching. Timer, signal sonore, lecteur vocal et coaching en temps réel.
               </p>
 
               <div className="flex flex-wrap gap-6 mb-10">
                 <div className="flex items-center gap-2">
                   <Clock className="w-4 h-4 text-muted-foreground" />
-                  <span className="text-sm text-foreground/70">9 séances</span>
+                  <span className="text-sm text-foreground/70">15 séances</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Heart className="w-4 h-4 text-muted-foreground" />
@@ -267,7 +317,7 @@ export default function Home() {
               Choisissez votre programme
             </h2>
             <p className="text-muted-foreground max-w-xl mx-auto">
-              9 séances complètes au sol, sans matériel, guidées pas à pas avec timer,
+              15 séances complètes au sol, sans matériel, guidées pas à pas avec timer,
               illustrations, signal sonore et lecteur vocal.
             </p>
           </motion.div>
@@ -399,7 +449,7 @@ export default function Home() {
                     </h3>
                     <p className="text-sm text-muted-foreground leading-relaxed">
                       Compte à rebours visuel pour chaque exercice. 45 secondes
-                      d'effort, transitions guidées. 9 séances complètes disponibles.
+                      d'effort, transitions guidées. 15 séances complètes disponibles.
                     </p>
                   </div>
                 </div>
@@ -492,7 +542,7 @@ export default function Home() {
               Prête à transpirer ?
             </h2>
             <p className="text-muted-foreground text-lg mb-8 max-w-md mx-auto">
-              9 séances de Pilates, Mobilité et Stretching au sol. Choisissez votre programme
+              15 séances de Pilates, HIIT, Mobilité et Stretching au sol. Choisissez votre programme
               et laissez-vous guider exercice par exercice.
             </p>
             <div className="flex flex-col sm:flex-row items-center gap-4 justify-center">

@@ -1,5 +1,5 @@
 /*
- * Registre central des 9 séances Coach Mimi
+ * Registre central des 15 séances Coach Mimi
  */
 
 import type { SessionConfig } from "./sessionTypes";
@@ -12,6 +12,12 @@ import { session6 } from "./session6Data";
 import { session7 } from "./session7Data";
 import { session8 } from "./session8Data";
 import { session9 } from "./session9Data";
+import { session10 } from "./session10Data";
+import { session11 } from "./session11Data";
+import { session12 } from "./session12Data";
+import { session13 } from "./session13Data";
+import { session14 } from "./session14Data";
+import { session15 } from "./session15Data";
 
 export const session1: SessionConfig = {
   id: "classique",
@@ -38,6 +44,12 @@ export const allSessions: SessionConfig[] = [
   session7,
   session8,
   session9,
+  session10,
+  session11,
+  session12,
+  session13,
+  session14,
+  session15,
 ];
 
 export function getSessionById(id: string): SessionConfig | undefined {
