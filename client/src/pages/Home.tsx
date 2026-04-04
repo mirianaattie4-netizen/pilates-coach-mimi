@@ -164,12 +164,60 @@ const SESSION_COLORS: Record<string, {
     badgeColor: "bg-purple-600/15 text-purple-400",
     ctaGradient: "from-purple-600 to-violet-500",
   },
+  "hiit-pyramide": {
+    gradient: "from-amber-600/10 via-transparent to-transparent",
+    border: "border-amber-600/20 hover:border-amber-500/50",
+    icon: Zap,
+    iconColor: "text-amber-400",
+    badgeColor: "bg-amber-600/15 text-amber-400",
+    ctaGradient: "from-amber-600 to-red-500",
+  },
+  "hiit-emom": {
+    gradient: "from-lime-500/10 via-transparent to-transparent",
+    border: "border-lime-500/20 hover:border-lime-400/50",
+    icon: Flame,
+    iconColor: "text-lime-400",
+    badgeColor: "bg-lime-500/15 text-lime-400",
+    ctaGradient: "from-lime-600 to-green-500",
+  },
+  "hiit-amrap": {
+    gradient: "from-sky-600/10 via-transparent to-transparent",
+    border: "border-sky-600/20 hover:border-sky-500/50",
+    icon: Zap,
+    iconColor: "text-sky-400",
+    badgeColor: "bg-sky-600/15 text-sky-400",
+    ctaGradient: "from-sky-600 to-blue-500",
+  },
+  "muscu-fullbody": {
+    gradient: "from-slate-500/10 via-transparent to-transparent",
+    border: "border-slate-500/20 hover:border-slate-400/50",
+    icon: Dumbbell,
+    iconColor: "text-slate-400",
+    badgeColor: "bg-slate-500/15 text-slate-400",
+    ctaGradient: "from-slate-600 to-zinc-500",
+  },
+  "muscu-push": {
+    gradient: "from-rose-600/10 via-transparent to-transparent",
+    border: "border-rose-600/20 hover:border-rose-500/50",
+    icon: Dumbbell,
+    iconColor: "text-rose-400",
+    badgeColor: "bg-rose-600/15 text-rose-400",
+    ctaGradient: "from-rose-600 to-pink-500",
+  },
+  "muscu-pull-legs": {
+    gradient: "from-emerald-600/10 via-transparent to-transparent",
+    border: "border-emerald-600/20 hover:border-emerald-500/50",
+    icon: Dumbbell,
+    iconColor: "text-emerald-400",
+    badgeColor: "bg-emerald-600/15 text-emerald-400",
+    ctaGradient: "from-emerald-600 to-teal-500",
+  },
 };
 
 const defaultColor = SESSION_COLORS.classique;
 
 /* ─── Category filter ─── */
-type Category = "all" | "pilates" | "mobilite" | "stretching" | "hiit";
+type Category = "all" | "pilates" | "mobilite" | "stretching" | "hiit" | "musculation";
 
 const CATEGORIES: { key: Category; label: string; color: string }[] = [
   { key: "all", label: "Toutes", color: "from-red-500/20 to-orange-500/20 text-orange-300" },
@@ -177,13 +225,15 @@ const CATEGORIES: { key: Category; label: string; color: string }[] = [
   { key: "mobilite", label: "Mobilité", color: "from-cyan-500/20 to-blue-500/20 text-cyan-300" },
   { key: "stretching", label: "Stretching", color: "from-fuchsia-500/20 to-purple-500/20 text-fuchsia-300" },
   { key: "hiit", label: "HIIT Circuit", color: "from-red-600/20 to-rose-500/20 text-red-400" },
+  { key: "musculation", label: "Musculation", color: "from-slate-500/20 to-zinc-500/20 text-slate-300" },
 ];
 
 function getSessionCategory(id: string): Category {
   if (["classique", "contemporain", "avance", "bas-du-corps", "haut-du-corps"].includes(id)) return "pilates";
   if (["mobilite", "mobilite-hanches", "mobilite-colonne"].includes(id)) return "mobilite";
   if (id === "stretching") return "stretching";
-  if (["hiit-fullbody", "hiit-bas-du-corps", "hiit-haut-du-corps", "hiit-core", "hiit-cardio", "hiit-tabata"].includes(id)) return "hiit";
+  if (["hiit-fullbody", "hiit-bas-du-corps", "hiit-haut-du-corps", "hiit-core", "hiit-cardio", "hiit-tabata", "hiit-pyramide", "hiit-emom", "hiit-amrap"].includes(id)) return "hiit";
+  if (["muscu-fullbody", "muscu-push", "muscu-pull-legs"].includes(id)) return "musculation";
   return "pilates";
 }
 
@@ -240,9 +290,9 @@ export default function Home() {
               </div>
 
               <h1 className="font-display text-5xl md:text-7xl font-bold leading-[0.95] mb-6">
-                <span className="text-foreground">15 Séances</span>
+                <span className="text-foreground">21 Séances</span>
                 <br />
-                <span className="text-foreground">Pilates, HIIT &amp; Mobilité</span>
+                <span className="text-foreground">Pilates, HIIT, Muscu &amp; Mobilité</span>
                 <br />
                 <span className="bg-gradient-to-r from-red-400 via-orange-400 to-amber-400 bg-clip-text text-transparent">
                   Guidées au Sol
@@ -250,15 +300,15 @@ export default function Home() {
               </h1>
 
               <p className="text-lg text-foreground/60 leading-relaxed mb-8 max-w-lg">
-                15 séances complètes : Pilates Classique, Avancé, Contemporain, Bas &amp; Haut du Corps, 
-                6 circuits HIIT (Full Body, Bas du Corps, Haut du Corps, Core, Cardio, Tabata), 
-                Mobilité, Stretching. Timer, signal sonore, lecteur vocal et coaching en temps réel.
+                21 séances complètes : Pilates (Classique, Avancé, Contemporain, Bas &amp; Haut du Corps), 
+                9 circuits HIIT (Full Body, Bas du Corps, Haut du Corps, Core, Cardio, Tabata, Pyramide, EMOM, AMRAP), 
+                Musculation (Full Body, Push, Pull &amp; Legs), Mobilité et Stretching. Timer, signal sonore, lecteur vocal et coaching en temps réel.
               </p>
 
               <div className="flex flex-wrap gap-6 mb-10">
                 <div className="flex items-center gap-2">
                   <Clock className="w-4 h-4 text-muted-foreground" />
-                  <span className="text-sm text-foreground/70">15 séances</span>
+                  <span className="text-sm text-foreground/70">21 séances</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Heart className="w-4 h-4 text-muted-foreground" />
@@ -317,7 +367,7 @@ export default function Home() {
               Choisissez votre programme
             </h2>
             <p className="text-muted-foreground max-w-xl mx-auto">
-              15 séances complètes au sol, sans matériel, guidées pas à pas avec timer,
+              21 séances complètes au sol, sans matériel, guidées pas à pas avec timer,
               illustrations, signal sonore et lecteur vocal.
             </p>
           </motion.div>
@@ -449,7 +499,7 @@ export default function Home() {
                     </h3>
                     <p className="text-sm text-muted-foreground leading-relaxed">
                       Compte à rebours visuel pour chaque exercice. 45 secondes
-                      d'effort, transitions guidées. 15 séances complètes disponibles.
+                      d'effort, transitions guidées. 21 séances complètes disponibles.
                     </p>
                   </div>
                 </div>
@@ -542,7 +592,7 @@ export default function Home() {
               Prête à transpirer ?
             </h2>
             <p className="text-muted-foreground text-lg mb-8 max-w-md mx-auto">
-              15 séances de Pilates, HIIT, Mobilité et Stretching au sol. Choisissez votre programme
+              21 séances de Pilates, HIIT, Musculation, Mobilité et Stretching au sol. Choisissez votre programme
               et laissez-vous guider exercice par exercice.
             </p>
             <div className="flex flex-col sm:flex-row items-center gap-4 justify-center">

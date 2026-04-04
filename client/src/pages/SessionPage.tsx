@@ -6,6 +6,8 @@
 
 import { useTimer } from "@/hooks/useTimer";
 import { useSpeech } from "@/hooks/useSpeech";
+import { useVoiceRecorder } from "@/hooks/useVoiceRecorder";
+import VoiceRecorderPanel from "@/components/VoiceRecorderPanel";
 import CircularTimer from "@/components/CircularTimer";
 import ExerciseCard from "@/components/ExerciseCard";
 import ExerciseList from "@/components/ExerciseList";
@@ -29,7 +31,7 @@ import {
 import { useLocation, useParams } from "wouter";
 import { getSessionById } from "@/lib/sessions";
 import { getTotalMainExercises } from "@/lib/sessionTypes";
-import { useMemo, useEffect, useRef } from "react";
+import { useMemo, useEffect, useRef, useState } from "react";
 
 const HERO_IMG =
   "https://d2xsxph8kpxj0f.cloudfront.net/310519663442254125/EDJjErcDe3f7pkvHdYd45d/hero-pilates-dark-eDrXjLic23sPpALmrZe8nq.webp";
@@ -49,6 +51,96 @@ const SESSION_COLORS: Record<string, { gradient: string; text: string; glow: str
     gradient: "from-cyan-500 to-blue-500",
     text: "text-cyan-400",
     glow: "glow-blue",
+  },
+  avance: {
+    gradient: "from-red-500 to-rose-500",
+    text: "text-red-400",
+    glow: "glow-coral",
+  },
+  "bas-du-corps": {
+    gradient: "from-pink-500 to-rose-500",
+    text: "text-pink-400",
+    glow: "glow-coral",
+  },
+  "haut-du-corps": {
+    gradient: "from-violet-500 to-purple-500",
+    text: "text-violet-400",
+    glow: "glow-blue",
+  },
+  "hanches-bassin": {
+    gradient: "from-teal-500 to-cyan-500",
+    text: "text-teal-400",
+    glow: "glow-blue",
+  },
+  "colonne-epaules": {
+    gradient: "from-amber-500 to-yellow-500",
+    text: "text-amber-400",
+    glow: "glow-coral",
+  },
+  stretching: {
+    gradient: "from-fuchsia-500 to-pink-500",
+    text: "text-fuchsia-400",
+    glow: "glow-coral",
+  },
+  "hiit-fullbody": {
+    gradient: "from-red-600 to-orange-500",
+    text: "text-red-400",
+    glow: "glow-coral",
+  },
+  "hiit-bas-du-corps": {
+    gradient: "from-orange-600 to-amber-500",
+    text: "text-orange-400",
+    glow: "glow-coral",
+  },
+  "hiit-haut-du-corps": {
+    gradient: "from-rose-600 to-red-500",
+    text: "text-rose-400",
+    glow: "glow-coral",
+  },
+  "hiit-core": {
+    gradient: "from-yellow-600 to-orange-500",
+    text: "text-yellow-400",
+    glow: "glow-coral",
+  },
+  "hiit-cardio": {
+    gradient: "from-red-500 to-pink-600",
+    text: "text-red-400",
+    glow: "glow-coral",
+  },
+  "hiit-tabata": {
+    gradient: "from-fuchsia-600 to-red-500",
+    text: "text-fuchsia-400",
+    glow: "glow-coral",
+  },
+  "hiit-pyramide": {
+    gradient: "from-amber-600 to-red-500",
+    text: "text-amber-400",
+    glow: "glow-coral",
+  },
+  "hiit-emom": {
+    gradient: "from-lime-600 to-green-500",
+    text: "text-lime-400",
+    glow: "glow-green",
+  },
+  "hiit-amrap": {
+    gradient: "from-sky-600 to-blue-500",
+    text: "text-sky-400",
+    glow: "glow-blue",
+  },
+  "muscu-fullbody": {
+    gradient: "from-slate-600 to-zinc-500",
+    text: "text-slate-400",
+    glow: "glow-blue",
+  },
+  "muscu-push": {
+    gradient: "from-rose-600 to-pink-500",
+    text: "text-rose-400",
+    glow: "glow-coral",
+  },
+  "muscu-pull-legs": {
+    gradient: "from-emerald-600 to-teal-500",
+    text: "text-emerald-400",
+    glow: "glow-green",
   },
 };
 
@@ -84,24 +176,48 @@ export default function SessionPage() {
     isSupported: speechSupported,
   } = useSpeech({ rate: 0.9, volume: 1 });
 
+  const {
+    isRecording: isVoiceRecording,
+    isPlaying: isVoicePlaying,
+    isSupported: voiceRecorderSupported,
+    hasRecordingFor,
+    startRecording,
+    stopRecording,
+    playRecording,
+    playRecordingForExercise,
+    removeRecording,
+    stopPlayback,
+  } = useVoiceRecorder();
+
+  const [recorderOpen, setRecorderOpen] = useState(false);
+
   const colors = SESSION_COLORS[sessionId] || SESSION_COLORS.classique;
   const prevSpeechIndexRef = useRef(-1);
 
-  // Speak exercise instructions when exercise changes
+  // Speak exercise instructions when exercise changes — use personal voice if available
   useEffect(() => {
     if (sessionState !== "running") return;
     if (currentIndex === prevSpeechIndexRef.current) return;
     if (!currentExercise) return;
     prevSpeechIndexRef.current = currentIndex;
-    speakExercise(currentExercise.name, currentExercise.coaching, currentExercise.isTransition);
-  }, [currentIndex, sessionState, currentExercise, speakExercise]);
+
+    const exerciseKey = `${sessionId}-${currentExercise.id}`;
+    if (hasRecordingFor(exerciseKey)) {
+      // Play Coach Mimi's own recorded voice
+      playRecordingForExercise(exerciseKey);
+    } else {
+      // Fallback to TTS
+      speakExercise(currentExercise.name, currentExercise.coaching, currentExercise.isTransition);
+    }
+  }, [currentIndex, sessionState, currentExercise, speakExercise, hasRecordingFor, playRecordingForExercise, sessionId]);
 
   // Cancel speech when paused or finished
   useEffect(() => {
     if (sessionState === "paused" || sessionState === "finished" || sessionState === "idle") {
       cancelSpeech();
+      stopPlayback();
     }
-  }, [sessionState, cancelSpeech]);
+  }, [sessionState, cancelSpeech, stopPlayback]);
 
   // Reset speech index on reset
   useEffect(() => {
@@ -241,12 +357,38 @@ export default function SessionPage() {
               Démarrer la séance
             </Button>
 
+            {/* Record my voice button */}
+            {voiceRecorderSupported && (
+              <button
+                onClick={() => setRecorderOpen(true)}
+                className="flex items-center gap-2 mx-auto mt-4 px-5 py-2.5 rounded-full text-xs font-display transition-all bg-red-500/10 text-red-400 border border-red-500/30 hover:bg-red-500/20"
+              >
+                <Mic className="w-3.5 h-3.5" />
+                Enregistrer ma voix
+              </button>
+            )}
+
             <button onClick={() => setLocation("/")} className="block mx-auto mt-6 text-sm text-muted-foreground hover:text-foreground transition-colors">
               <ChevronLeft className="w-3 h-3 inline mr-1" />
               Retour à l'accueil
             </button>
           </motion.div>
         </div>
+
+        {/* Voice Recorder Panel */}
+        <VoiceRecorderPanel
+          exercises={exerciseList}
+          sessionId={sessionId}
+          isOpen={recorderOpen}
+          onClose={() => setRecorderOpen(false)}
+          isRecording={isVoiceRecording}
+          isPlaying={isVoicePlaying}
+          hasRecordingFor={hasRecordingFor}
+          startRecording={startRecording}
+          stopRecording={stopRecording}
+          playRecording={playRecording}
+          removeRecording={removeRecording}
+        />
       </div>
     );
   }

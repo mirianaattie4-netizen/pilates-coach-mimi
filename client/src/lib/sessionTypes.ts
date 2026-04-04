@@ -27,6 +27,7 @@ export interface SessionConfig {
   level: string;
   duration: string;
   equipment: string;
+  category?: string; // pilates, mobilite, stretching, hiit, musculation
   phaseLabels: Record<Phase, string>;
   exercises: Exercise[];
   totalDuration: number;
