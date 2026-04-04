@@ -9,6 +9,7 @@ import SessionPage from "./pages/SessionPage";
 import About from "./pages/About";
 import Gallery from "./pages/Gallery";
 import Pricing from "./pages/Pricing";
+import Profile from "./pages/Profile";
 
 function Router() {
   return (
@@ -17,6 +18,7 @@ function Router() {
       <Route path="/a-propos" component={About} />
       <Route path="/galerie" component={Gallery} />
       <Route path="/abonnement" component={Pricing} />
+      <Route path="/profil" component={Profile} />
       <Route path="/session/:id" component={SessionPage} />
       <Route path="/session" component={SessionPage} />
       <Route path={"/404"} component={NotFound} />

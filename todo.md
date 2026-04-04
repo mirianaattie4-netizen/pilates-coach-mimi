@@ -26,3 +26,19 @@
 - [x] Tests unitaires subscription (9 tests passés)
 - [x] Vérification visuelle des badges et de la page pricing
 - [x] Sauvegarder checkpoint
+
+## Phase 6 : Page Profil utilisateur
+- [x] Procédure tRPC pour récupérer les détails d'abonnement (statut, date renouvellement, plan)
+- [x] Procédure tRPC pour récupérer l'historique des paiements via Stripe API
+- [x] Page Profil avec informations utilisateur (nom, email)
+- [x] Section gestion d'abonnement (statut actuel, date renouvellement, bouton annuler/réactiver)
+- [x] Section historique des paiements (date, montant, statut, reçu)
+- [x] Route /profil dans App.tsx et lien dans le footer/navigation
+- [x] Tests unitaires pour les nouvelles procédures
+- [x] Vérification visuelle de la page
+
+## Phase 6b : Corrections et améliorations page Profil
+- [x] Ajouter une action de réactivation d'abonnement (backend + bouton UI)
+- [x] Améliorer gestion d'erreurs dans details et paymentHistory (remonter erreurs côté UI)
+- [x] Ajouter tests unitaires avec mocks Stripe pour les cas succès (details + paymentHistory)
+- [x] Vérifier visuellement la page profil en état authentifié

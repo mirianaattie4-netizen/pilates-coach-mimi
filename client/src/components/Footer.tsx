@@ -81,6 +81,12 @@ export default function Footer() {
               >
                 Abonnement Premium
               </Link>
+              <Link
+                href="/profil"
+                className="block text-sm text-foreground/70 hover:text-foreground transition-colors"
+              >
+                Mon Profil
+              </Link>
             </nav>
           </div>
 

@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { appRouter } from "./routers";
 import type { TrpcContext } from "./_core/context";
 import { isFreeSession, isFreeSesion, FREE_SESSION_IDS, PREMIUM_PLAN } from "./stripe/products";
@@ -157,5 +157,275 @@ describe("subscription.plan", () => {
     expect(plan.freeSessionIds).toContain("classique");
     expect(plan.freeSessionIds).toContain("mobilite");
     expect(plan.freeSessionIds).toContain("stretching");
+  });
+});
+
+describe("subscription.details", () => {
+  it("returns non-premium details for free user with no error", async () => {
+    const ctx = createAuthContext({ subscriptionStatus: "free" });
+    const caller = appRouter.createCaller(ctx);
+
+    const details = await caller.subscription.details();
+    expect(details.isPremium).toBe(false);
+    expect(details.plan).toBeNull();
+    expect(details.currentPeriodEnd).toBeNull();
+    expect(details.cancelAtPeriodEnd).toBe(false);
+    expect(details.status).toBe("free");
+    expect(details.error).toBeNull();
+  });
+
+  it("returns cancelled status for cancelled user without active sub", async () => {
+    const ctx = createAuthContext({ subscriptionStatus: "cancelled" });
+    const caller = appRouter.createCaller(ctx);
+
+    const details = await caller.subscription.details();
+    expect(details.isPremium).toBe(false);
+    expect(details.status).toBe("cancelled");
+    expect(details.error).toBeNull();
+  });
+
+  it("returns expected shape with all required fields", async () => {
+    const ctx = createAuthContext({ subscriptionStatus: "free" });
+    const caller = appRouter.createCaller(ctx);
+
+    const details = await caller.subscription.details();
+    expect(details).toHaveProperty("isPremium");
+    expect(details).toHaveProperty("plan");
+    expect(details).toHaveProperty("currentPeriodEnd");
+    expect(details).toHaveProperty("cancelAtPeriodEnd");
+    expect(details).toHaveProperty("status");
+    expect(details).toHaveProperty("error");
+  });
+
+  it("returns premium details with Stripe data when subscription is active", async () => {
+    // Mock db helpers to simulate premium user with active subscription
+    const dbModule = await import("./db");
+    vi.spyOn(dbModule, "userHasPremium").mockResolvedValue(true);
+    vi.spyOn(dbModule, "getActiveSubscription").mockResolvedValue({
+      id: 1,
+      userId: 1,
+      stripeSubscriptionId: "sub_test_abc",
+      stripeCustomerId: "cus_test_123",
+      status: "active",
+      currentPeriodEnd: new Date(),
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    } as any);
+
+    // Mock Stripe to return subscription details
+    const stripeModule = await import("./stripe/stripe");
+    vi.spyOn(stripeModule, "getStripe").mockImplementation(() => ({
+      subscriptions: {
+        retrieve: () => Promise.resolve({
+          current_period_end: 1735689600, // 2025-01-01 00:00:00 UTC
+          cancel_at_period_end: false,
+          status: "active",
+        }),
+      },
+    } as any));
+
+    const ctx = createAuthContext({ subscriptionStatus: "premium" });
+    const caller = appRouter.createCaller(ctx);
+
+    const details = await caller.subscription.details();
+    expect(details.isPremium).toBe(true);
+    expect(details.plan).toBe("Coach Mimi Premium");
+    expect(details.currentPeriodEnd).toBe(1735689600 * 1000);
+    expect(details.cancelAtPeriodEnd).toBe(false);
+    expect(details.status).toBe("active");
+    expect(details.error).toBeNull();
+
+    vi.restoreAllMocks();
+  });
+
+  it("returns cancelAtPeriodEnd=true when subscription is set to cancel", async () => {
+    const dbModule = await import("./db");
+    vi.spyOn(dbModule, "userHasPremium").mockResolvedValue(true);
+    vi.spyOn(dbModule, "getActiveSubscription").mockResolvedValue({
+      id: 1,
+      userId: 1,
+      stripeSubscriptionId: "sub_test_cancel",
+      stripeCustomerId: "cus_test_456",
+      status: "active",
+      currentPeriodEnd: new Date(),
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    } as any);
+
+    const stripeModule = await import("./stripe/stripe");
+    vi.spyOn(stripeModule, "getStripe").mockImplementation(() => ({
+      subscriptions: {
+        retrieve: () => Promise.resolve({
+          current_period_end: 1738368000,
+          cancel_at_period_end: true,
+          status: "active",
+        }),
+      },
+    } as any));
+
+    const ctx = createAuthContext({ subscriptionStatus: "premium" });
+    const caller = appRouter.createCaller(ctx);
+
+    const details = await caller.subscription.details();
+    expect(details.isPremium).toBe(true);
+    expect(details.cancelAtPeriodEnd).toBe(true);
+    expect(details.currentPeriodEnd).toBe(1738368000 * 1000);
+    expect(details.error).toBeNull();
+
+    vi.restoreAllMocks();
+  });
+
+  it("returns error message when Stripe API fails but preserves premium status", async () => {
+    const dbModule = await import("./db");
+    vi.spyOn(dbModule, "userHasPremium").mockResolvedValue(true);
+    vi.spyOn(dbModule, "getActiveSubscription").mockResolvedValue({
+      id: 1,
+      userId: 1,
+      stripeSubscriptionId: "sub_test_err",
+      stripeCustomerId: "cus_test_789",
+      status: "active",
+      currentPeriodEnd: new Date(),
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    } as any);
+
+    const stripeModule = await import("./stripe/stripe");
+    vi.spyOn(stripeModule, "getStripe").mockImplementation(() => ({
+      subscriptions: {
+        retrieve: () => { throw new Error("Stripe down"); },
+      },
+    } as any));
+
+    const ctx = createAuthContext({ subscriptionStatus: "premium" });
+    const caller = appRouter.createCaller(ctx);
+
+    const details = await caller.subscription.details();
+    expect(details.isPremium).toBe(true);
+    expect(details.plan).toBe("Coach Mimi Premium");
+    expect(details.error).toBeTruthy();
+    expect(typeof details.error).toBe("string");
+
+    vi.restoreAllMocks();
+  });
+});
+
+describe("subscription.paymentHistory", () => {
+  it("returns empty payments for user without stripeCustomerId", async () => {
+    const ctx = createAuthContext({ stripeCustomerId: null });
+    const caller = appRouter.createCaller(ctx);
+
+    const result = await caller.subscription.paymentHistory();
+    expect(result.payments).toEqual([]);
+    expect(result.error).toBeNull();
+  });
+
+  it("returns expected shape with payments array and error field", async () => {
+    const ctx = createAuthContext({ stripeCustomerId: null });
+    const caller = appRouter.createCaller(ctx);
+
+    const result = await caller.subscription.paymentHistory();
+    expect(result).toHaveProperty("payments");
+    expect(result).toHaveProperty("error");
+    expect(Array.isArray(result.payments)).toBe(true);
+  });
+
+  it("gracefully handles Stripe API errors with error message", async () => {
+    const stripeModule = await import("./stripe/stripe");
+
+    vi.spyOn(stripeModule, "getStripe").mockImplementation(() => {
+      return {
+        invoices: {
+          list: () => { throw new Error("Stripe API unavailable"); },
+        },
+      } as any;
+    });
+
+    const ctx = createAuthContext({ stripeCustomerId: "cus_test_123" });
+    const caller = appRouter.createCaller(ctx);
+
+    const result = await caller.subscription.paymentHistory();
+    expect(result.payments).toEqual([]);
+    expect(result.error).toBeTruthy();
+    expect(typeof result.error).toBe("string");
+
+    vi.restoreAllMocks();
+  });
+
+  it("returns mapped payment data from Stripe invoices on success", async () => {
+    const stripeModule = await import("./stripe/stripe");
+
+    vi.spyOn(stripeModule, "getStripe").mockImplementation(() => ({
+      invoices: {
+        list: () => Promise.resolve({
+          data: [
+            {
+              id: "in_test_001",
+              created: 1733011200, // 2024-12-01
+              amount_paid: 10000,
+              currency: "xof",
+              status: "paid",
+              lines: { data: [{ description: "Coach Mimi Premium" }] },
+              hosted_invoice_url: "https://invoice.stripe.com/test-receipt",
+              invoice_pdf: "https://invoice.stripe.com/test.pdf",
+              period_start: 1730419200,
+              period_end: 1733011200,
+            },
+            {
+              id: "in_test_002",
+              created: 1730419200,
+              amount_paid: 10000,
+              currency: "xof",
+              status: "paid",
+              lines: { data: [{ description: "Coach Mimi Premium" }] },
+              hosted_invoice_url: null,
+              invoice_pdf: null,
+              period_start: 1727740800,
+              period_end: 1730419200,
+            },
+          ],
+        }),
+      },
+    } as any));
+
+    const ctx = createAuthContext({ stripeCustomerId: "cus_test_success" });
+    const caller = appRouter.createCaller(ctx);
+
+    const result = await caller.subscription.paymentHistory();
+    expect(result.error).toBeNull();
+    expect(result.payments).toHaveLength(2);
+
+    const first = result.payments[0];
+    expect(first.id).toBe("in_test_001");
+    expect(first.date).toBe(1733011200 * 1000);
+    expect(first.amount).toBe(10000);
+    expect(first.currency).toBe("xof");
+    expect(first.status).toBe("paid");
+    expect(first.description).toBe("Coach Mimi Premium");
+    expect(first.receiptUrl).toBe("https://invoice.stripe.com/test-receipt");
+    expect(first.invoicePdf).toBe("https://invoice.stripe.com/test.pdf");
+    expect(first.periodStart).toBe(1730419200 * 1000);
+    expect(first.periodEnd).toBe(1733011200 * 1000);
+
+    const second = result.payments[1];
+    expect(second.receiptUrl).toBeNull();
+    expect(second.invoicePdf).toBeNull();
+
+    vi.restoreAllMocks();
+  });
+});
+
+describe("Router structure", () => {
+  it("has all expected subscription procedures including reactivate", () => {
+    const ctx = createPublicContext();
+    const caller = appRouter.createCaller(ctx);
+
+    expect(caller.subscription.plan).toBeDefined();
+    expect(caller.subscription.canAccessSession).toBeDefined();
+    expect(caller.subscription.details).toBeDefined();
+    expect(caller.subscription.paymentHistory).toBeDefined();
+    expect(caller.subscription.createCheckout).toBeDefined();
+    expect(caller.subscription.cancel).toBeDefined();
+    expect(caller.subscription.reactivate).toBeDefined();
+    expect(caller.subscription.status).toBeDefined();
   });
 });

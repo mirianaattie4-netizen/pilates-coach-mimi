@@ -5,6 +5,7 @@ import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
 import { getActiveSubscription, userHasPremium } from "./db";
 import { getStripe } from "./stripe/stripe";
 import { PREMIUM_PLAN, FREE_SESSION_IDS, isFreeSession } from "./stripe/products";
+import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
 export const appRouter = router({
@@ -30,19 +31,94 @@ export const appRouter = router({
       };
     }),
 
+    /** Get detailed subscription info for profile page */
+    details: protectedProcedure.query(async ({ ctx }) => {
+      const isPremium = await userHasPremium(ctx.user.id);
+      const sub = await getActiveSubscription(ctx.user.id);
+
+      if (!isPremium || !sub?.stripeSubscriptionId) {
+        return {
+          isPremium: false,
+          plan: null,
+          currentPeriodEnd: null,
+          cancelAtPeriodEnd: false,
+          status: ctx.user.subscriptionStatus ?? "free",
+          error: null,
+        };
+      }
+
+      try {
+        const stripe = getStripe();
+        const stripeSub = await stripe.subscriptions.retrieve(sub.stripeSubscriptionId);
+        return {
+          isPremium: true,
+          plan: PREMIUM_PLAN.name,
+          currentPeriodEnd: stripeSub.current_period_end * 1000,
+          cancelAtPeriodEnd: stripeSub.cancel_at_period_end,
+          status: stripeSub.status,
+          error: null,
+        };
+      } catch (error: any) {
+        console.error("[Subscription] Failed to fetch Stripe details:", error.message);
+        return {
+          isPremium,
+          plan: PREMIUM_PLAN.name,
+          currentPeriodEnd: null,
+          cancelAtPeriodEnd: false,
+          status: sub.status,
+          error: "Impossible de récupérer les détails de l'abonnement depuis Stripe.",
+        };
+      }
+    }),
+
+    /** Get payment history from Stripe invoices */
+    paymentHistory: protectedProcedure.query(async ({ ctx }) => {
+      const customerId = ctx.user.stripeCustomerId;
+      if (!customerId) {
+        return { payments: [], error: null };
+      }
+
+      try {
+        const stripe = getStripe();
+        const invoices = await stripe.invoices.list({
+          customer: customerId,
+          limit: 20,
+          status: "paid",
+        });
+
+        const payments = invoices.data.map((invoice) => ({
+          id: invoice.id,
+          date: (invoice.created ?? 0) * 1000,
+          amount: invoice.amount_paid ?? 0,
+          currency: invoice.currency ?? "xof",
+          status: invoice.status ?? "unknown",
+          description: invoice.lines?.data?.[0]?.description ?? PREMIUM_PLAN.name,
+          receiptUrl: invoice.hosted_invoice_url ?? null,
+          invoicePdf: invoice.invoice_pdf ?? null,
+          periodStart: (invoice.period_start ?? 0) * 1000,
+          periodEnd: (invoice.period_end ?? 0) * 1000,
+        }));
+
+        return { payments, error: null };
+      } catch (error: any) {
+        console.error("[Subscription] Failed to fetch payment history:", error.message);
+        return {
+          payments: [],
+          error: "Impossible de récupérer l'historique des paiements. Veuillez réessayer.",
+        };
+      }
+    }),
+
     /** Check if a specific session is accessible */
     canAccessSession: publicProcedure
       .input(z.object({ sessionId: z.string() }))
       .query(async ({ ctx, input }) => {
-        // Free sessions are always accessible
         if (isFreeSession(input.sessionId)) {
           return { canAccess: true, isFree: true };
         }
-        // Not logged in → cannot access premium
         if (!ctx.user) {
           return { canAccess: false, isFree: false };
         }
-        // Check premium status
         const isPremium = await userHasPremium(ctx.user.id);
         return { canAccess: isPremium, isFree: false };
       }),
@@ -52,7 +128,6 @@ export const appRouter = router({
       const stripe = getStripe();
       const origin = ctx.req.headers.origin || ctx.req.headers.referer?.replace(/\/$/, "") || "http://localhost:3000";
 
-      // Create or retrieve Stripe customer
       let customerId = ctx.user.stripeCustomerId;
       if (!customerId) {
         const customer = await stripe.customers.create({
@@ -83,7 +158,7 @@ export const appRouter = router({
                 name: PREMIUM_PLAN.name,
                 description: PREMIUM_PLAN.description,
               },
-              unit_amount: PREMIUM_PLAN.priceAmountXOF, // XOF is zero-decimal
+              unit_amount: PREMIUM_PLAN.priceAmountXOF,
               recurring: {
                 interval: PREMIUM_PLAN.interval,
               },
@@ -98,7 +173,7 @@ export const appRouter = router({
       return { checkoutUrl: session.url };
     }),
 
-    /** Cancel subscription via Stripe */
+    /** Cancel subscription via Stripe (cancel at period end) */
     cancel: protectedProcedure.mutation(async ({ ctx }) => {
       const sub = await getActiveSubscription(ctx.user.id);
       if (!sub?.stripeSubscriptionId) {
@@ -114,6 +189,32 @@ export const appRouter = router({
       } catch (error: any) {
         console.error("[Subscription] Cancel error:", error.message);
         return { success: false, error: "Erreur lors de l'annulation. Veuillez réessayer." };
+      }
+    }),
+
+    /** Reactivate a subscription that was set to cancel at period end */
+    reactivate: protectedProcedure.mutation(async ({ ctx }) => {
+      const sub = await getActiveSubscription(ctx.user.id);
+      if (!sub?.stripeSubscriptionId) {
+        return { success: false, error: "Aucun abonnement trouvé à réactiver" };
+      }
+
+      try {
+        const stripe = getStripe();
+        const stripeSub = await stripe.subscriptions.retrieve(sub.stripeSubscriptionId);
+
+        // Can only reactivate if it's set to cancel at period end but still active
+        if (!stripeSub.cancel_at_period_end) {
+          return { success: false, error: "L'abonnement n'est pas en cours d'annulation" };
+        }
+
+        await stripe.subscriptions.update(sub.stripeSubscriptionId, {
+          cancel_at_period_end: false,
+        });
+        return { success: true };
+      } catch (error: any) {
+        console.error("[Subscription] Reactivate error:", error.message);
+        return { success: false, error: "Erreur lors de la réactivation. Veuillez réessayer." };
       }
     }),
 
