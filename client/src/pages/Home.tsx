@@ -3,6 +3,8 @@
  * Hero sombre avec vidéo, photo Coach Mimi, sélecteur de séances par catégorie
  */
 
+import { useAuth } from "@/_core/hooks/useAuth";
+import { useSubscription } from "@/hooks/useSubscription";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import {
@@ -22,11 +24,14 @@ import {
   Dumbbell,
   ArrowUpRight,
   Mic,
+  Lock,
+  Crown,
 } from "lucide-react";
 import { useLocation } from "wouter";
 import { useRef, useState } from "react";
 import { allSessions } from "@/lib/sessions";
 import Footer from "@/components/Footer";
+import { toast } from "sonner";
 
 const HERO_VIDEO =
   "https://d2xsxph8kpxj0f.cloudfront.net/310519663442254125/EDJjErcDe3f7pkvHdYd45d/jardindeden_2103c822.mp4";
@@ -238,10 +243,24 @@ function getSessionCategory(id: string): Category {
 }
 
 export default function Home() {
+  // The userAuth hooks provides authentication state
+  // To implement login/logout functionality, simply call logout() or redirect to getLoginUrl()
+  let { user, loading, error, isAuthenticated, logout } = useAuth();
+  const { isPremium, isSessionFree, canAccessSession } = useSubscription();
+
   const [, setLocation] = useLocation();
   const videoRef = useRef<HTMLVideoElement>(null);
   const [videoLoaded, setVideoLoaded] = useState(false);
   const [activeCategory, setActiveCategory] = useState<Category>("all");
+
+  const handleSessionClick = (sessionId: string) => {
+    if (canAccessSession(sessionId)) {
+      setLocation(`/session/${sessionId}`);
+    } else {
+      toast.info("Cette séance nécessite un abonnement Premium.");
+      setLocation("/abonnement");
+    }
+  };
 
   const filteredSessions = activeCategory === "all"
     ? allSessions
@@ -410,8 +429,31 @@ export default function Home() {
                   viewport={{ once: true }}
                   transition={{ duration: 0.4, delay: idx * 0.08 }}
                   className={`group relative rounded-2xl overflow-hidden border bg-card transition-all duration-500 ${style.border} cursor-pointer`}
-                  onClick={() => setLocation(`/session/${session.id}`)}
+                  onClick={() => handleSessionClick(session.id)}
                 >
+                  {/* Free/Premium badge */}
+                  {isSessionFree(session.id) ? (
+                    <div className="absolute top-3 right-3 z-10 px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-400 text-[10px] font-display font-bold uppercase tracking-wider flex items-center gap-1">
+                      <Heart className="w-3 h-3" />
+                      Gratuit
+                    </div>
+                  ) : !canAccessSession(session.id) ? (
+                    <div className="absolute top-3 right-3 z-10 px-2.5 py-1 rounded-full bg-amber-500/20 text-amber-400 text-[10px] font-display font-bold uppercase tracking-wider flex items-center gap-1">
+                      <Crown className="w-3 h-3" />
+                      Premium
+                    </div>
+                  ) : null}
+
+                  {/* Lock overlay for premium sessions */}
+                  {!canAccessSession(session.id) && (
+                    <div className="absolute inset-0 z-[5] bg-background/30 backdrop-blur-[1px] flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                      <div className="flex items-center gap-2 bg-amber-500/20 px-4 py-2 rounded-full">
+                        <Lock className="w-4 h-4 text-amber-400" />
+                        <span className="text-amber-400 text-sm font-display font-bold">Abonnement requis</span>
+                      </div>
+                    </div>
+                  )}
+
                   {/* Top gradient accent */}
                   <div className={`h-1 bg-gradient-to-r ${style.ctaGradient}`} />
 
@@ -608,11 +650,11 @@ export default function Home() {
               </Button>
               <Button
                 size="lg"
-                onClick={() => setLocation('/galerie')}
-                className="font-display text-lg px-10 py-7 bg-white/5 border border-white/10 text-white hover:bg-white/10 rounded-2xl group"
+                onClick={() => setLocation('/abonnement')}
+                className="font-display text-lg px-10 py-7 bg-gradient-to-r from-amber-500 to-orange-500 text-white hover:from-amber-600 hover:to-orange-600 rounded-2xl group"
               >
-                <ImageIcon className="w-5 h-5 mr-3 group-hover:scale-110 transition-transform" />
-                Galerie d'exercices
+                <Crown className="w-5 h-5 mr-3 group-hover:scale-110 transition-transform" />
+                Abonnement Premium
               </Button>
             </div>
           </motion.div>

@@ -75,6 +75,12 @@ export default function Footer() {
               >
                 Galerie d'exercices
               </Link>
+              <Link
+                href="/abonnement"
+                className="block text-sm text-amber-400/80 hover:text-amber-400 transition-colors font-medium"
+              >
+                Abonnement Premium
+              </Link>
             </nav>
           </div>
 

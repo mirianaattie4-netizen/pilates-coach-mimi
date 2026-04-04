@@ -32,6 +32,9 @@ import { useLocation, useParams } from "wouter";
 import { getSessionById } from "@/lib/sessions";
 import { getTotalMainExercises } from "@/lib/sessionTypes";
 import { useMemo, useEffect, useRef, useState } from "react";
+import { useSubscription } from "@/hooks/useSubscription";
+import { Lock, Crown } from "lucide-react";
+import { getLoginUrl } from "@/const";
 
 const HERO_IMG =
   "https://d2xsxph8kpxj0f.cloudfront.net/310519663442254125/EDJjErcDe3f7pkvHdYd45d/hero-pilates-dark-eDrXjLic23sPpALmrZe8nq.webp";
@@ -226,6 +229,8 @@ export default function SessionPage() {
     }
   }, [sessionState]);
 
+  const { canAccessSession, isSessionFree, isAuthenticated, isPremium } = useSubscription();
+
   if (!session) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -233,6 +238,56 @@ export default function SessionPage() {
           <h1 className="font-display text-3xl text-foreground mb-4">Séance introuvable</h1>
           <Button onClick={() => setLocation("/")}>Retour à l'accueil</Button>
         </div>
+      </div>
+    );
+  }
+
+  // Access control: block premium sessions for non-subscribers
+  if (!canAccessSession(sessionId)) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+        <motion.div
+          initial={{ scale: 0.9, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ duration: 0.5 }}
+          className="text-center max-w-md"
+        >
+          <div className="w-24 h-24 rounded-full bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center mx-auto mb-8">
+            <Crown className="w-12 h-12 text-background" />
+          </div>
+          <h1 className="font-display text-3xl font-bold text-foreground mb-4">
+            Séance Premium
+          </h1>
+          <p className="text-muted-foreground text-lg mb-2">{session.title}</p>
+          <p className="text-muted-foreground text-sm mb-8">
+            Cette séance nécessite un abonnement Premium à 10 000 FCFA/mois pour y accéder.
+          </p>
+          <div className="flex gap-4 justify-center flex-wrap">
+            <Button variant="outline" size="lg" onClick={() => setLocation("/")} className="font-display">
+              <ChevronLeft className="w-4 h-4 mr-2" />
+              Accueil
+            </Button>
+            {!isAuthenticated ? (
+              <Button
+                size="lg"
+                onClick={() => { window.location.href = getLoginUrl(); }}
+                className="font-display bg-gradient-to-r from-amber-500 to-orange-500 text-white hover:from-amber-600 hover:to-orange-600"
+              >
+                <Lock className="w-4 h-4 mr-2" />
+                Se connecter
+              </Button>
+            ) : (
+              <Button
+                size="lg"
+                onClick={() => setLocation("/abonnement")}
+                className="font-display bg-gradient-to-r from-amber-500 to-orange-500 text-white hover:from-amber-600 hover:to-orange-600"
+              >
+                <Crown className="w-4 h-4 mr-2" />
+                S'abonner
+              </Button>
+            )}
+          </div>
+        </motion.div>
       </div>
     );
   }
