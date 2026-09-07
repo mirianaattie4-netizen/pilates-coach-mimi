@@ -13,6 +13,7 @@ import {
   Swords,
   Baby,
   Dumbbell,
+  Medal,
 } from "lucide-react";
 import {
   Tabs,
@@ -22,6 +23,8 @@ import {
 } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import Footer from "@/components/Footer";
+
+const COACH_PHOTO = "/images/coach-mimi-backyard-ultra.jpg";
 
 /* ─── Data: Planning de Cours (Adultes) ─── */
 
@@ -146,6 +149,48 @@ export default function Planning() {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
+      {/* Coach */}
+      <section className="border-b border-border/20">
+        <div className="container py-14">
+          <motion.div
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ duration: 0.6 }}
+            className="grid md:grid-cols-[auto_1fr] gap-8 items-center"
+          >
+            <div className="relative w-32 h-32 md:w-40 md:h-40 mx-auto md:mx-0 shrink-0">
+              <img
+                src={COACH_PHOTO}
+                alt="Coach Mimi"
+                className="w-full h-full object-cover rounded-3xl"
+              />
+              <div className="absolute inset-0 rounded-3xl ring-1 ring-white/10" />
+            </div>
+            <div className="text-center md:text-left">
+              <div className="flex items-center justify-center md:justify-start gap-2 mb-3">
+                <div className="w-7 h-7 rounded-full bg-red-500/20 flex items-center justify-center">
+                  <Medal className="w-3.5 h-3.5 text-red-400" />
+                </div>
+                <span className="font-display text-xs uppercase tracking-[0.25em] text-red-400 font-medium">
+                  Votre coach
+                </span>
+              </div>
+              <h2 className="font-display text-2xl md:text-3xl font-bold text-foreground mb-3">
+                Coach Mimi
+              </h2>
+              <p className="text-sm md:text-base text-foreground/60 leading-relaxed max-w-2xl mx-auto md:mx-0">
+                Coach sportif fonctionnel certifiée (6 diplômes), Coach Mimi encadre
+                les cours de Pilates, mobilité et renforcement de The Labs Training
+                Camp. Passionnée de dépassement de soi, elle est aussi ultra-traileuse :
+                elle a couru le Backyard Ultra Abidjan aux côtés de Terres d'Endurance,
+                repoussant ses limites tour après tour avec la même exigence qu'elle
+                transmet à chacun de ses élèves.
+              </p>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
       {/* Header */}
       <header className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-red-500/5 via-transparent to-transparent" />
