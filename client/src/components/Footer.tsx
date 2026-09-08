@@ -76,6 +76,12 @@ export default function Footer() {
                 Galerie d'exercices
               </Link>
               <Link
+                href="/planning"
+                className="block text-sm text-foreground/70 hover:text-foreground transition-colors"
+              >
+                Planning des cours
+              </Link>
+              <Link
                 href="/abonnement"
                 className="block text-sm text-amber-400/80 hover:text-amber-400 transition-colors font-medium"
               >
