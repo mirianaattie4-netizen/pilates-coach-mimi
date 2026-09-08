@@ -1,7 +1,7 @@
 /*
  * Page Planning — The Labs Training Camp
  * Design: "Néon Fitness Flow" — fond sombre, accents corail
- * 3 plannings : Cours Adultes, Kids, Combat
+ * 4 plannings : Pilates, Cours Adultes, Kids, Combat
  */
 
 import { useState } from "react";
@@ -14,6 +14,7 @@ import {
   Baby,
   Dumbbell,
   Medal,
+  Heart,
 } from "lucide-react";
 import {
   Tabs,
@@ -25,6 +26,89 @@ import { Badge } from "@/components/ui/badge";
 import Footer from "@/components/Footer";
 
 const COACH_PHOTO = "/images/coach-mimi-backyard-ultra.jpg";
+
+/* ─── Data: Planning Pilates & Yoga ─── */
+
+interface PilatesSlot {
+  time: string;
+  name: string;
+}
+
+interface PilatesDay {
+  day: string;
+  slots: PilatesSlot[];
+}
+
+const pilatesSchedule: PilatesDay[] = [
+  {
+    day: "Lundi",
+    slots: [
+      { time: "8h30", name: "Mat Pilates" },
+      { time: "9h30", name: "Yoga" },
+      { time: "15h30", name: "Pilates Kids" },
+      { time: "16h30", name: "Reformer" },
+      { time: "17h30", name: "Reformer" },
+      { time: "18h30", name: "Reformer" },
+    ],
+  },
+  {
+    day: "Mardi",
+    slots: [
+      { time: "11h30", name: "Reformer" },
+      { time: "16h30", name: "Reformer" },
+      { time: "18h30", name: "Reformer" },
+    ],
+  },
+  {
+    day: "Mercredi",
+    slots: [
+      { time: "8h30", name: "Yoga" },
+      { time: "9h30", name: "Reformer" },
+      { time: "15h30", name: "Pilates Kids" },
+      { time: "17h30", name: "Reformer" },
+      { time: "18h30", name: "Mat Pilates" },
+      { time: "19h30", name: "Special Core" },
+    ],
+  },
+  {
+    day: "Jeudi",
+    slots: [
+      { time: "8h30", name: "Glutes & Core Training" },
+      { time: "16h30", name: "Reformer" },
+      { time: "18h30", name: "Reformer" },
+      { time: "19h30", name: "Yoga" },
+    ],
+  },
+  {
+    day: "Vendredi",
+    slots: [
+      { time: "8h30", name: "Mat Pilates" },
+      { time: "10h30", name: "Reformer" },
+      { time: "15h30", name: "Pilates Kids" },
+      { time: "16h30", name: "Yoga" },
+      { time: "17h30", name: "Reformer" },
+    ],
+  },
+  {
+    day: "Samedi",
+    slots: [
+      { time: "9h00", name: "Reformer" },
+      { time: "10h00", name: "Pilates Ado" },
+      { time: "11h00", name: "Pilates" },
+    ],
+  },
+];
+
+const pilatesClassColor: Record<string, string> = {
+  "Mat Pilates": "bg-emerald-400",
+  Pilates: "bg-emerald-400",
+  "Pilates Kids": "bg-amber-400",
+  "Pilates Ado": "bg-amber-400",
+  Yoga: "bg-purple-400",
+  Reformer: "bg-cyan-400",
+  "Special Core": "bg-rose-400",
+  "Glutes & Core Training": "bg-rose-400",
+};
 
 /* ─── Data: Planning de Cours (Adultes) ─── */
 
@@ -145,7 +229,7 @@ const jiuJitsuSchedule = [
 ];
 
 export default function Planning() {
-  const [tab, setTab] = useState("cours");
+  const [tab, setTab] = useState("pilates");
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -257,6 +341,13 @@ export default function Planning() {
           <Tabs value={tab} onValueChange={setTab} className="gap-10">
             <TabsList className="h-auto p-1.5 bg-card/60 border border-border/30 rounded-2xl">
               <TabsTrigger
+                value="pilates"
+                className="rounded-xl px-4 py-2.5 gap-2 font-display text-xs uppercase tracking-wider"
+              >
+                <Heart className="w-4 h-4" />
+                Pilates
+              </TabsTrigger>
+              <TabsTrigger
                 value="cours"
                 className="rounded-xl px-4 py-2.5 gap-2 font-display text-xs uppercase tracking-wider"
               >
@@ -278,6 +369,46 @@ export default function Planning() {
                 Combat
               </TabsTrigger>
             </TabsList>
+
+            {/* Pilates & Yoga */}
+            <TabsContent value="pilates">
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {pilatesSchedule.map((day, idx) => (
+                  <motion.div
+                    key={day.day}
+                    initial={{ y: 20, opacity: 0 }}
+                    whileInView={{ y: 0, opacity: 1 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.4, delay: idx * 0.05 }}
+                    className="rounded-2xl bg-card/60 border border-border/30 p-6"
+                  >
+                    <h3 className="font-display text-lg font-bold text-foreground mb-4">
+                      {day.day}
+                    </h3>
+                    <ul className="space-y-2.5">
+                      {day.slots.map((slot, i) => (
+                        <li
+                          key={i}
+                          className="flex items-center justify-between text-sm border-b border-border/10 pb-2.5 last:border-0 last:pb-0"
+                        >
+                          <span className="text-muted-foreground font-medium tabular-nums">
+                            {slot.time}
+                          </span>
+                          <span className="flex items-center gap-2 text-foreground/90">
+                            {slot.name}
+                            <span
+                              className={`w-1.5 h-1.5 rounded-full ${
+                                pilatesClassColor[slot.name] ?? "bg-foreground/30"
+                              }`}
+                            />
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  </motion.div>
+                ))}
+              </div>
+            </TabsContent>
 
             {/* Cours Adultes */}
             <TabsContent value="cours">
