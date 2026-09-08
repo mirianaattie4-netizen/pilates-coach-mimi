@@ -25,7 +25,8 @@ import {
 import { Badge } from "@/components/ui/badge";
 import Footer from "@/components/Footer";
 
-const COACH_PHOTO = "/images/coach-mimi-backyard-ultra.jpg";
+const COACH_PHOTO =
+  "https://d2xsxph8kpxj0f.cloudfront.net/310519663442254125/EDJjErcDe3f7pkvHdYd45d/coach-mimi-photo_6625e8f3.jpeg";
 
 /* ─── Data: Planning Pilates & Yoga ─── */
 
