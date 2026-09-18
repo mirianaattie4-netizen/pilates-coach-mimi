@@ -191,7 +191,7 @@ export default function Profile() {
             Connectez-vous pour acc\u00e9der \u00e0 votre profil et g\u00e9rer votre abonnement.
           </p>
           <Button
-            onClick={() => { window.location.href = getLoginUrl("/profil"); }}
+            onClick={() => { window.location.href = getLoginUrl(); }}
             className="bg-gradient-to-r from-red-500 to-orange-500 text-white hover:from-red-600 hover:to-orange-600 rounded-xl px-8 py-3"
           >
             Se connecter

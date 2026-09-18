@@ -50,10 +50,11 @@ export const appRouter = router({
       try {
         const stripe = getStripe();
         const stripeSub = await stripe.subscriptions.retrieve(sub.stripeSubscriptionId);
+        const currentPeriodEnd = stripeSub.items.data[0]?.current_period_end;
         return {
           isPremium: true,
           plan: PREMIUM_PLAN.name,
-          currentPeriodEnd: stripeSub.current_period_end * 1000,
+          currentPeriodEnd: currentPeriodEnd ? currentPeriodEnd * 1000 : null,
           cancelAtPeriodEnd: stripeSub.cancel_at_period_end,
           status: stripeSub.status,
           error: null,

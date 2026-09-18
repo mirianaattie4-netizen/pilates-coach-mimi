@@ -217,7 +217,7 @@ describe("subscription.details", () => {
     vi.spyOn(stripeModule, "getStripe").mockImplementation(() => ({
       subscriptions: {
         retrieve: () => Promise.resolve({
-          current_period_end: 1735689600, // 2025-01-01 00:00:00 UTC
+          items: { data: [{ current_period_end: 1735689600 }] }, // 2025-01-01 00:00:00 UTC
           cancel_at_period_end: false,
           status: "active",
         }),
@@ -256,7 +256,7 @@ describe("subscription.details", () => {
     vi.spyOn(stripeModule, "getStripe").mockImplementation(() => ({
       subscriptions: {
         retrieve: () => Promise.resolve({
-          current_period_end: 1738368000,
+          items: { data: [{ current_period_end: 1738368000 }] },
           cancel_at_period_end: true,
           status: "active",
         }),
