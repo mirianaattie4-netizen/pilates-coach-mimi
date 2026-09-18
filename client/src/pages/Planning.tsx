@@ -1,7 +1,7 @@
 /*
  * Page Planning — The Labs Training Camp
  * Design: "Néon Fitness Flow" — fond sombre, accents corail
- * 4 plannings : Pilates, Cours Adultes, Kids, Combat
+ * 5 plannings : Pilates, Cours Adultes, Kids, Combat, Tarifs
  */
 
 import { useState } from "react";
@@ -15,6 +15,7 @@ import {
   Dumbbell,
   Medal,
   Heart,
+  Tag,
 } from "lucide-react";
 import {
   Tabs,
@@ -26,6 +27,47 @@ import { Badge } from "@/components/ui/badge";
 import Footer from "@/components/Footer";
 
 const OWNER_PHOTO = "/images/oly-owner.jpg";
+
+/* ─── Data: Tarifs ─── */
+
+interface TarifLine {
+  label: string;
+  price: string;
+}
+
+const labsTarifs: TarifLine[] = [
+  { label: "Séance", price: "8 000 FCFA" },
+  { label: "Mensuel Classique The Labs", price: "55 000 FCFA" },
+  { label: "Mensuel Offre Musculation Only", price: "40 000 FCFA" },
+  { label: "Mensuel Ados & Étudiants", price: "40 000 FCFA" },
+  { label: "Mensuel Offre Famille (1 parent + 1 enfant)", price: "70 000 FCFA" },
+  { label: "Jiu-Jitsu The Labs", price: "40 000 FCFA" },
+];
+
+const kidsActivities = [
+  "Boxe",
+  "Taekwondo",
+  "Judo",
+  "Gymnastique",
+  "Cross Training Kids",
+  "Pilates",
+];
+
+const kidsTarifs: TarifLine[] = [
+  { label: "2 activités / semaine", price: "40 000 FCFA / mois" },
+  { label: "1 activité / semaine", price: "25 000 FCFA / mois" },
+];
+
+const baobabTarifs: TarifLine[] = [
+  { label: "Séance", price: "12 000 FCFA" },
+  { label: "Mensuel Studio Baobab — 8 séances", price: "70 000 FCFA" },
+  { label: "Mensuel Studio Baobab — 12 séances", price: "90 000 FCFA" },
+  {
+    label: "Mensuel Hybrid Access (Studio Baobab & The Labs)",
+    price: "75 000 FCFA",
+  },
+  { label: "Mensuel Ados (8 séances)", price: "50 000 FCFA" },
+];
 
 /* ─── Data: Planning Pilates & Yoga ─── */
 
@@ -363,6 +405,13 @@ export default function Planning() {
                 <Swords className="w-4 h-4" />
                 Combat
               </TabsTrigger>
+              <TabsTrigger
+                value="tarifs"
+                className="rounded-xl px-4 py-2.5 gap-2 font-display text-xs uppercase tracking-wider"
+              >
+                <Tag className="w-4 h-4" />
+                Tarifs
+              </TabsTrigger>
             </TabsList>
 
             {/* Pilates & Yoga */}
@@ -576,6 +625,81 @@ export default function Planning() {
                             </span>
                           ))}
                         </div>
+                      </li>
+                    ))}
+                  </ul>
+                </motion.div>
+              </div>
+            </TabsContent>
+
+            {/* Tarifs */}
+            <TabsContent value="tarifs">
+              <div className="grid md:grid-cols-2 gap-6">
+                <motion.div
+                  initial={{ y: 20, opacity: 0 }}
+                  whileInView={{ y: 0, opacity: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.4 }}
+                  className="rounded-2xl bg-card/60 border border-border/30 p-6"
+                >
+                  <h3 className="font-logo text-2xl text-red-400 mb-5">
+                    THE LABS TRAINING CAMP
+                  </h3>
+                  <ul className="space-y-3 mb-6">
+                    {labsTarifs.map((t) => (
+                      <li
+                        key={t.label}
+                        className="flex items-center justify-between gap-4 text-sm border-b border-border/10 pb-3 last:border-0 last:pb-0"
+                      >
+                        <span className="text-foreground/80">{t.label}</span>
+                        <span className="font-display font-semibold text-foreground whitespace-nowrap">
+                          {t.price}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+
+                  <h4 className="font-logo text-base text-amber-400 mb-2">
+                    ACTIVITÉS ENFANTS
+                  </h4>
+                  <p className="text-xs text-muted-foreground mb-4">
+                    {kidsActivities.join(" · ")}
+                  </p>
+                  <ul className="space-y-3">
+                    {kidsTarifs.map((t) => (
+                      <li
+                        key={t.label}
+                        className="flex items-center justify-between gap-4 text-sm border-b border-border/10 pb-3 last:border-0 last:pb-0"
+                      >
+                        <span className="text-foreground/80">{t.label}</span>
+                        <span className="font-display font-semibold text-foreground whitespace-nowrap">
+                          {t.price}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                </motion.div>
+
+                <motion.div
+                  initial={{ y: 20, opacity: 0 }}
+                  whileInView={{ y: 0, opacity: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.4, delay: 0.1 }}
+                  className="rounded-2xl bg-card/60 border border-border/30 p-6"
+                >
+                  <h3 className="font-logo text-2xl text-red-400 mb-5">
+                    STUDIO BAOBAB
+                  </h3>
+                  <ul className="space-y-3">
+                    {baobabTarifs.map((t) => (
+                      <li
+                        key={t.label}
+                        className="flex items-center justify-between gap-4 text-sm border-b border-border/10 pb-3 last:border-0 last:pb-0"
+                      >
+                        <span className="text-foreground/80">{t.label}</span>
+                        <span className="font-display font-semibold text-foreground whitespace-nowrap">
+                          {t.price}
+                        </span>
                       </li>
                     ))}
                   </ul>

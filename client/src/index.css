@@ -138,6 +138,10 @@
     font-family: 'Space Grotesk', system-ui, sans-serif;
   }
 
+  .font-logo {
+    font-family: 'Anton', 'Space Grotesk', system-ui, sans-serif;
+  }
+
   .glow-coral {
     box-shadow: 0 0 20px oklch(0.72 0.19 25 / 0.3), 0 0 60px oklch(0.72 0.19 25 / 0.1);
   }
