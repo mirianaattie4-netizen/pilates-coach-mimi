@@ -376,38 +376,38 @@ export default function Planning() {
       <section className="pb-24">
         <div className="container">
           <Tabs value={tab} onValueChange={setTab} className="gap-10">
-            <TabsList className="h-auto p-1.5 bg-card/60 border border-border/30 rounded-2xl">
+            <TabsList className="h-auto max-w-full overflow-x-auto p-1.5 bg-card/60 border border-border/30 rounded-2xl justify-start">
               <TabsTrigger
                 value="pilates"
-                className="rounded-xl px-4 py-2.5 gap-2 font-display text-xs uppercase tracking-wider"
+                className="shrink-0 whitespace-nowrap rounded-xl px-4 py-2.5 gap-2 font-display text-xs uppercase tracking-wider"
               >
                 <Heart className="w-4 h-4" />
                 Pilates
               </TabsTrigger>
               <TabsTrigger
                 value="cours"
-                className="rounded-xl px-4 py-2.5 gap-2 font-display text-xs uppercase tracking-wider"
+                className="shrink-0 whitespace-nowrap rounded-xl px-4 py-2.5 gap-2 font-display text-xs uppercase tracking-wider"
               >
                 <Dumbbell className="w-4 h-4" />
                 Cours Adultes
               </TabsTrigger>
               <TabsTrigger
                 value="kids"
-                className="rounded-xl px-4 py-2.5 gap-2 font-display text-xs uppercase tracking-wider"
+                className="shrink-0 whitespace-nowrap rounded-xl px-4 py-2.5 gap-2 font-display text-xs uppercase tracking-wider"
               >
                 <Baby className="w-4 h-4" />
                 Kids
               </TabsTrigger>
               <TabsTrigger
                 value="combat"
-                className="rounded-xl px-4 py-2.5 gap-2 font-display text-xs uppercase tracking-wider"
+                className="shrink-0 whitespace-nowrap rounded-xl px-4 py-2.5 gap-2 font-display text-xs uppercase tracking-wider"
               >
                 <Swords className="w-4 h-4" />
                 Combat
               </TabsTrigger>
               <TabsTrigger
                 value="tarifs"
-                className="rounded-xl px-4 py-2.5 gap-2 font-display text-xs uppercase tracking-wider"
+                className="shrink-0 whitespace-nowrap rounded-xl px-4 py-2.5 gap-2 font-display text-xs uppercase tracking-wider"
               >
                 <Tag className="w-4 h-4" />
                 Tarifs
@@ -512,7 +512,7 @@ export default function Planning() {
             </TabsContent>
 
             {/* Kids */}
-            <TabsContent value="kids">
+            <TabsContent value="kids" className="min-w-0">
               <motion.div
                 initial={{ y: 20, opacity: 0 }}
                 whileInView={{ y: 0, opacity: 1 }}
