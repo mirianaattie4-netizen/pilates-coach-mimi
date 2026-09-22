@@ -8,7 +8,6 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { Link } from "wouter";
 import {
-  Flame,
   Clock,
   Swords,
   Baby,
@@ -24,7 +23,6 @@ import {
   TabsTrigger,
 } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import Footer from "@/components/Footer";
 
 const OWNER_PHOTO = "/images/oly-owner.jpg";
 
@@ -141,17 +139,6 @@ const pilatesSchedule: PilatesDay[] = [
   },
 ];
 
-const pilatesClassColor: Record<string, string> = {
-  "Mat Pilates": "bg-emerald-400",
-  Pilates: "bg-emerald-400",
-  "Pilates Kids": "bg-amber-400",
-  "Pilates Ado": "bg-amber-400",
-  Yoga: "bg-purple-400",
-  Reformer: "bg-cyan-400",
-  "Special Core": "bg-rose-400",
-  "Glutes & Core Training": "bg-rose-400",
-};
-
 /* ─── Data: Planning de Cours (Adultes) ─── */
 
 type Tag = "CROSS" | "STUDIO" | "DOJO";
@@ -169,9 +156,9 @@ interface DaySchedule {
 }
 
 const tagStyles: Record<Tag, string> = {
-  CROSS: "bg-orange-500/15 text-orange-400 border-orange-500/30",
-  STUDIO: "bg-pink-500/15 text-pink-400 border-pink-500/30",
-  DOJO: "bg-red-500/15 text-red-400 border-red-500/30",
+  CROSS: "bg-red-500 text-white border-red-500",
+  STUDIO: "bg-red-500/15 text-red-400 border-red-500/30",
+  DOJO: "bg-foreground/10 text-foreground/80 border-border/40",
 };
 
 const coursSchedule: DaySchedule[] = [
@@ -317,27 +304,15 @@ export default function Planning() {
         <div className="absolute inset-0 bg-gradient-to-b from-red-500/5 via-transparent to-transparent" />
         <div className="container relative pt-8 pb-16">
           <nav className="flex items-center justify-between mb-16">
-            <Link href="/" className="flex items-center gap-2 group">
-              <div className="w-9 h-9 rounded-full bg-red-500/20 flex items-center justify-center group-hover:bg-red-500/30 transition-colors">
-                <Flame className="w-4 h-4 text-red-400" />
+            <div className="flex items-center gap-2">
+              <div className="w-9 h-9 rounded-full bg-red-500/20 flex items-center justify-center">
+                <Dumbbell className="w-4 h-4 text-red-400" />
               </div>
-              <span className="font-display text-sm font-bold text-foreground/80 group-hover:text-foreground transition-colors">
-                Coach Mimi
+              <span className="font-logo text-sm text-foreground/90">
+                The Labs Training Camp
               </span>
-            </Link>
+            </div>
             <div className="flex items-center gap-6">
-              <Link
-                href="/"
-                className="text-xs text-muted-foreground hover:text-foreground transition-colors hidden sm:block"
-              >
-                Accueil
-              </Link>
-              <Link
-                href="/a-propos"
-                className="text-xs text-muted-foreground hover:text-foreground transition-colors hidden sm:block"
-              >
-                À propos
-              </Link>
               <Link href="/planning" className="text-xs text-red-400 font-medium">
                 Planning
               </Link>
@@ -360,7 +335,7 @@ export default function Planning() {
             </div>
             <h1 className="font-display text-4xl md:text-6xl font-bold leading-tight mb-4">
               <span className="text-foreground">The Labs</span>{" "}
-              <span className="bg-gradient-to-r from-red-400 via-orange-400 to-amber-400 bg-clip-text text-transparent">
+              <span className="text-red-400">
                 Training Camp
               </span>
             </h1>
@@ -440,11 +415,7 @@ export default function Planning() {
                           </span>
                           <span className="flex items-center gap-2 text-foreground/90">
                             {slot.name}
-                            <span
-                              className={`w-1.5 h-1.5 rounded-full ${
-                                pilatesClassColor[slot.name] ?? "bg-foreground/30"
-                              }`}
-                            />
+                            <span className="w-1.5 h-1.5 rounded-full bg-red-400" />
                           </span>
                         </li>
                       ))}
@@ -493,15 +464,7 @@ export default function Planning() {
                           </span>
                           <span className="flex items-center gap-2 text-foreground/90">
                             {slot.name}
-                            <span
-                              className={`w-1.5 h-1.5 rounded-full ${
-                                slot.tag === "CROSS"
-                                  ? "bg-orange-400"
-                                  : slot.tag === "STUDIO"
-                                    ? "bg-pink-400"
-                                    : "bg-red-400"
-                              }`}
-                            />
+                            <span className="w-1.5 h-1.5 rounded-full bg-red-400" />
                           </span>
                         </li>
                       ))}
@@ -612,14 +575,14 @@ export default function Planning() {
                   <ul className="space-y-4">
                     {jiuJitsuSchedule.map((d) => (
                       <li key={d.day}>
-                        <span className="font-display text-xs uppercase tracking-wider text-amber-400 block mb-1.5">
+                        <span className="font-display text-xs uppercase tracking-wider text-foreground/70 block mb-1.5">
                           {d.day}
                         </span>
                         <div className="flex flex-wrap gap-2">
                           {d.slots.map((s, i) => (
                             <span
                               key={i}
-                              className="text-xs px-2.5 py-1 rounded-lg bg-amber-500/10 border border-amber-500/20 text-foreground/80"
+                              className="text-xs px-2.5 py-1 rounded-lg bg-foreground/5 border border-border/40 text-foreground/80"
                             >
                               {s}
                             </span>
@@ -659,7 +622,7 @@ export default function Planning() {
                     ))}
                   </ul>
 
-                  <h4 className="font-logo text-base text-amber-400 mb-2">
+                  <h4 className="font-logo text-base text-red-400 mb-2">
                     ACTIVITÉS ENFANTS
                   </h4>
                   <p className="text-xs text-muted-foreground mb-4">
@@ -710,7 +673,12 @@ export default function Planning() {
         </div>
       </section>
 
-      <Footer />
+      <footer className="border-t border-border/20">
+        <div className="container py-8 flex flex-col sm:flex-row items-center justify-between gap-3">
+          <span className="font-logo text-sm text-foreground/80">The Labs Training Camp</span>
+          <span className="text-xs text-muted-foreground">Abidjan, Côte d'Ivoire</span>
+        </div>
+      </footer>
     </div>
   );
 }
