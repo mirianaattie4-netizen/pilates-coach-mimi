@@ -1,38 +1,37 @@
-# Coach Mimi's Online Pilates Coaching Platform
+# Coach Mimi — Plateforme de Coaching Pilates
 
-## Project Description
-Coach Mimi is an online Pilates coaching platform that offers personalized coaching sessions, instructional videos, and community support for Pilates enthusiasts of all levels. The platform aims to provide a comprehensive and engaging fitness experience.
+## Description du projet
+Site web interactif pour guider des séances de Pilates au sol et de renforcement fonctionnel, avec minuteur intégré, défilement automatique des exercices, illustrations de mouvements et instructions de coaching lues à voix haute. Le site propose 21 séances (Pilates, HIIT, Musculation, Mobilité, Stretching), une galerie d'exercices, une page À propos, et une page Planning listant les cours et tarifs de studios partenaires (The Labs Training Camp, Studio Baobab).
 
-## Features
-- **Personalized Coaching:** Tailored workout plans that adapt to individual fitness levels and goals.
-- **Video Tutorials:** A wide range of instructional videos led by experienced Pilates coaches.
-- **Community Support:** Interactive forums and chat features for users to connect and support each other.
-- **Progress Tracking:** Tools to monitor personal progress and achievements.
+## Fonctionnalités
+- **Séances guidées** : timer, défilement automatique, illustrations et lecteur vocal (TTS) pour chaque exercice.
+- **Abonnement Premium** : 3 séances gratuites, 18 séances réservées aux abonnés via Stripe (10 000 FCFA/mois).
+- **Authentification** : connexion via le portail OAuth Manus.
+- **Galerie d'exercices** : images et vidéos de démonstration par catégorie.
+- **Page Planning** : emplois du temps (Pilates, cours adultes, kids, combat) et tarifs de studios partenaires, avec paiement en ligne via Paystack.
+- **Profil utilisateur** : gestion d'abonnement, historique des paiements.
 
-## Pricing
-- **Free Trial:** 14-day free trial to explore all features.
-- **Monthly Subscription:** $29/month for full access to all coaching sessions and resources.
-- **Annual Subscription:** $249/year (saves $69 compared to monthly). 
+## Stack technique
+- **Frontend** : React 19, Vite, TypeScript, Tailwind CSS 4, Framer Motion, wouter (routing), tRPC (client)
+- **Backend** : Node.js, Express, tRPC (API), Drizzle ORM
+- **Base de données** : MySQL
+- **Paiements** : Stripe (abonnement Coach Mimi), Paystack (plans The Labs / Studio Baobab)
+- **Tests** : Vitest
+- **Gestionnaire de paquets** : pnpm
 
-## Tech Stack
-- **Frontend:** React.js, Redux, CSS
-- **Backend:** Node.js, Express.js
-- **Database:** MongoDB
-- **Hosting:** AWS, Heroku
+## Installation
+1. Cloner le dépôt : `git clone https://github.com/mirianaattie4-netizen/pilates-coach-mimi.git`
+2. Se placer dans le dossier : `cd pilates-coach-mimi`
+3. Installer les dépendances : `pnpm install`
+4. Configurer les variables d'environnement nécessaires : `DATABASE_URL`, `JWT_SECRET`, `OAUTH_SERVER_URL`, `OWNER_OPEN_ID`, `VITE_APP_ID`, `VITE_OAUTH_PORTAL_URL`, `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `BUILT_IN_FORGE_API_KEY`, `BUILT_IN_FORGE_API_URL`
+5. Lancer le serveur de développement : `pnpm dev`
 
-## Setup Instructions
-1. Clone the repository: `git clone https://github.com/mirianaattie4-netizen/pilates-coach-mimi.git`
-2. Navigate to the project directory: `cd pilates-coach-mimi`
-3. Install dependencies: `npm install`
-4. Set up environment variables as needed (refer to `.env.example` file).
-5. Start the development server: `npm run start`
+## Scripts disponibles
+- `pnpm dev` — serveur de développement (Vite + Express)
+- `pnpm build` — build de production (client + serveur)
+- `pnpm start` — démarre le build de production
+- `pnpm check` — vérification TypeScript
+- `pnpm test` — tests (Vitest)
 
-## Deployment Info
-To deploy the project:
-1. Ensure that all code is committed to the main branch.
-2. Push to the hosting platform (e.g., AWS, Heroku) using their respective deployment commands or setups.
-3. Monitor the deployment status and ensure all features are functioning as expected.
-
----
-
-**Last Updated:** 2026-04-01 20:17:25 (UTC)
+## Déploiement
+Le site est conçu pour tourner sur un hôte Node.js persistant (le serveur Express sert à la fois l'API et les fichiers statiques du build en production). Un `netlify.toml` est fourni pour héberger uniquement le frontend statique sur Netlify si besoin — dans ce cas, les fonctionnalités dépendant du backend (connexion, abonnement, profil) nécessitent que le serveur tourne par ailleurs et que les appels `/api/*` y soient redirigés.

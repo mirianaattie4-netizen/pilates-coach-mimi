@@ -359,8 +359,9 @@ export default function Planning() {
               </span>
             </h1>
             <p className="text-lg text-foreground/60 leading-relaxed max-w-lg">
-              Retrouvez tous les plannings de la semaine : cours adultes,
-              cours enfants et disciplines de combat.
+              Retrouvez tous les plannings de la semaine — Pilates, cours
+              adultes, cours enfants, disciplines de combat — et les tarifs
+              des deux studios.
             </p>
           </motion.div>
         </div>
