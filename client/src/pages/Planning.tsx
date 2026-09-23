@@ -15,6 +15,7 @@ import {
   Medal,
   Heart,
   Tag,
+  CreditCard,
 } from "lucide-react";
 import {
   Tabs,
@@ -25,6 +26,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 
 const OWNER_PHOTO = "/images/oly-owner.jpg";
+const PAYSTACK_URL = "https://paystack.shop/pay/30bo7x71o-";
 
 /* ─── Data: Tarifs ─── */
 
@@ -668,6 +670,27 @@ export default function Planning() {
                   </ul>
                 </motion.div>
               </div>
+
+              <motion.div
+                initial={{ y: 20, opacity: 0 }}
+                whileInView={{ y: 0, opacity: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.4, delay: 0.2 }}
+                className="mt-6 flex flex-col items-center gap-3 rounded-2xl border border-red-500/20 bg-red-500/5 p-6 text-center"
+              >
+                <p className="text-sm text-muted-foreground max-w-md">
+                  Réglez votre abonnement en ligne, en toute sécurité via Paystack.
+                </p>
+                <a
+                  href={PAYSTACK_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 rounded-xl bg-red-500 px-6 py-3 font-display text-sm font-semibold text-white transition-colors hover:bg-red-600"
+                >
+                  <CreditCard className="h-4 w-4" />
+                  S'abonner en ligne
+                </a>
+              </motion.div>
             </TabsContent>
           </Tabs>
         </div>
