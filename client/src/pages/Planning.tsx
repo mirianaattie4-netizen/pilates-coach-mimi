@@ -26,19 +26,27 @@ import {
 import { Badge } from "@/components/ui/badge";
 
 const OWNER_PHOTO = "/images/oly-owner.jpg";
-const PAYSTACK_URL = "https://paystack.shop/pay/30bo7x71o-";
 
 /* ─── Data: Tarifs ─── */
 
 interface TarifLine {
   label: string;
   price: string;
+  paymentUrl?: string;
 }
 
 const labsTarifs: TarifLine[] = [
   { label: "Séance", price: "8 000 FCFA" },
-  { label: "Mensuel Classique The Labs", price: "55 000 FCFA" },
-  { label: "Mensuel Offre Musculation Only", price: "40 000 FCFA" },
+  {
+    label: "Mensuel Classique The Labs",
+    price: "55 000 FCFA",
+    paymentUrl: "https://paystack.shop/pay/p2163fbq9k",
+  },
+  {
+    label: "Mensuel Offre Musculation Only",
+    price: "40 000 FCFA",
+    paymentUrl: "https://paystack.shop/pay/0glb-fiom4",
+  },
   { label: "Mensuel Ados & Étudiants", price: "40 000 FCFA" },
   { label: "Mensuel Offre Famille (1 parent + 1 enfant)", price: "70 000 FCFA" },
   { label: "Jiu-Jitsu The Labs", price: "40 000 FCFA" },
@@ -60,11 +68,20 @@ const kidsTarifs: TarifLine[] = [
 
 const baobabTarifs: TarifLine[] = [
   { label: "Séance", price: "12 000 FCFA" },
-  { label: "Mensuel Studio Baobab — 8 séances", price: "70 000 FCFA" },
-  { label: "Mensuel Studio Baobab — 12 séances", price: "90 000 FCFA" },
+  {
+    label: "Mensuel Studio Baobab — 8 séances",
+    price: "70 000 FCFA",
+    paymentUrl: "https://paystack.shop/pay/c28-ahpoxl",
+  },
+  {
+    label: "Mensuel Studio Baobab — 12 séances",
+    price: "90 000 FCFA",
+    paymentUrl: "https://paystack.shop/pay/t67u53tgon",
+  },
   {
     label: "Mensuel Hybrid Access (Studio Baobab & The Labs)",
     price: "75 000 FCFA",
+    paymentUrl: "https://paystack.shop/pay/30bo7x71o-",
   },
   { label: "Mensuel Ados (8 séances)", price: "50 000 FCFA" },
 ];
@@ -614,11 +631,24 @@ export default function Planning() {
                     {labsTarifs.map((t) => (
                       <li
                         key={t.label}
-                        className="flex items-center justify-between gap-4 text-sm border-b border-border/10 pb-3 last:border-0 last:pb-0"
+                        className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 text-sm border-b border-border/10 pb-3 last:border-0 last:pb-0"
                       >
                         <span className="text-foreground/80">{t.label}</span>
-                        <span className="font-display font-semibold text-foreground whitespace-nowrap">
-                          {t.price}
+                        <span className="flex items-center gap-3">
+                          <span className="font-display font-semibold text-foreground whitespace-nowrap">
+                            {t.price}
+                          </span>
+                          {t.paymentUrl && (
+                            <a
+                              href={t.paymentUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center gap-1 rounded-lg bg-red-500 px-2.5 py-1 text-[11px] font-semibold text-white transition-colors hover:bg-red-600"
+                            >
+                              <CreditCard className="h-3 w-3" />
+                              Payer
+                            </a>
+                          )}
                         </span>
                       </li>
                     ))}
@@ -659,11 +689,24 @@ export default function Planning() {
                     {baobabTarifs.map((t) => (
                       <li
                         key={t.label}
-                        className="flex items-center justify-between gap-4 text-sm border-b border-border/10 pb-3 last:border-0 last:pb-0"
+                        className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 text-sm border-b border-border/10 pb-3 last:border-0 last:pb-0"
                       >
                         <span className="text-foreground/80">{t.label}</span>
-                        <span className="font-display font-semibold text-foreground whitespace-nowrap">
-                          {t.price}
+                        <span className="flex items-center gap-3">
+                          <span className="font-display font-semibold text-foreground whitespace-nowrap">
+                            {t.price}
+                          </span>
+                          {t.paymentUrl && (
+                            <a
+                              href={t.paymentUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center gap-1 rounded-lg bg-red-500 px-2.5 py-1 text-[11px] font-semibold text-white transition-colors hover:bg-red-600"
+                            >
+                              <CreditCard className="h-3 w-3" />
+                              Payer
+                            </a>
+                          )}
                         </span>
                       </li>
                     ))}
@@ -671,26 +714,9 @@ export default function Planning() {
                 </motion.div>
               </div>
 
-              <motion.div
-                initial={{ y: 20, opacity: 0 }}
-                whileInView={{ y: 0, opacity: 1 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.4, delay: 0.2 }}
-                className="mt-6 flex flex-col items-center gap-3 rounded-2xl border border-red-500/20 bg-red-500/5 p-6 text-center"
-              >
-                <p className="text-sm text-muted-foreground max-w-md">
-                  Réglez votre abonnement en ligne, en toute sécurité via Paystack.
-                </p>
-                <a
-                  href={PAYSTACK_URL}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 rounded-xl bg-red-500 px-6 py-3 font-display text-sm font-semibold text-white transition-colors hover:bg-red-600"
-                >
-                  <CreditCard className="h-4 w-4" />
-                  S'abonner en ligne
-                </a>
-              </motion.div>
+              <p className="mt-6 text-center text-xs text-muted-foreground">
+                Paiement sécurisé en ligne via Paystack — cliquez sur « Payer » à côté d'une formule.
+              </p>
             </TabsContent>
           </Tabs>
         </div>
