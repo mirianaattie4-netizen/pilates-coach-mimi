@@ -553,7 +553,7 @@ export default function Planning() {
                   className="rounded-2xl bg-card/60 border border-border/30 p-6"
                 >
                   <h3 className="font-display text-lg font-bold text-foreground mb-1">
-                    Pied Poing / Anglaise
+                    Pieds-Poings / Anglaise
                   </h3>
                   <p className="text-xs text-muted-foreground mb-5">
                     Boxe pieds-poings et boxe anglaise
